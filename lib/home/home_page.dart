@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/widgets/item_gallery.dart';
 

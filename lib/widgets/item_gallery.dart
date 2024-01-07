@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+import 'dart:developer';
 
-import '../theme/theme_model.dart';
+import 'package:flutter/material.dart';
+import 'package:restaurant_app/widgets/image_button.dart';
 
 class ItemGallery extends StatelessWidget {
   final String title;
@@ -35,24 +36,18 @@ class ItemGallery extends StatelessWidget {
         Container(
           height: 120,
           child: items.length == 1
-              ? Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(height: 100, color: ThemeModel.darkGrey),
-                  ),
+              ? ImageButton(
+                  onTap: () => log('Image Button Tapped'),
                 )
               : ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: items.length,
                   itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Container(width: 120, color: ThemeModel.darkGrey),
-                      ),
-                    );
+                    return Container(
+                        width: 140,
+                        child: ImageButton(
+                          onTap: () => log('Image Button Tapped'),
+                        ));
                   },
                 ),
         )
