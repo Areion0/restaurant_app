@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/misc/extensions.dart';
+import 'package:restaurant_app/product/product_page.dart';
 import 'package:restaurant_app/widgets/image_button.dart';
 
 class ItemGallery extends StatelessWidget {
@@ -37,7 +39,7 @@ class ItemGallery extends StatelessWidget {
           height: 120,
           child: items.length == 1
               ? ImageButton(
-                  onTap: () => log('Image Button Tapped'),
+                  onTap: () => context.push(const ProductPage()),
                 )
               : ListView.builder(
                   scrollDirection: Axis.horizontal,
@@ -46,7 +48,7 @@ class ItemGallery extends StatelessWidget {
                     return Container(
                         width: 140,
                         child: ImageButton(
-                          onTap: () => log('Image Button Tapped'),
+                          onTap: () => context.push(const ProductPage()),
                         ));
                   },
                 ),
