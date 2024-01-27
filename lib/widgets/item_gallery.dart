@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/product/product_page.dart';

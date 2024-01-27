@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/cart/cart_controller.dart';
 import 'package:restaurant_app/home/home_page.dart';
 import 'package:restaurant_app/theme/theme_model.dart';
 
 void main() {
   runApp(
-     const RestaurantApp(),
+    MultiProvider(providers: [
+      ChangeNotifierProvider(create: (_) => CartController()),
+    ], child: const RestaurantApp()),
   );
 }
 

@@ -11,8 +11,24 @@ class ThemeModel {
   static ThemeData get theme {
     return ThemeData(
       fontFamily: GoogleFonts.inter().fontFamily,
-      textTheme: const TextTheme(
-        titleMedium: TextStyle(
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: darkRed,
+          foregroundColor: lightGrey,
+          textStyle: titleLargeTextStyle,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+      ),
+      textTheme: TextTheme(
+        titleLarge: titleLargeTextStyle,
+        titleMedium: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: darkBlue,
+        ),
+        bodyMedium: const TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
           color: darkBlue,
@@ -20,9 +36,9 @@ class ThemeModel {
       ),
       iconTheme: const IconThemeData(size: 34),
       colorScheme: const ColorScheme(
-        primary: darkBlue, // Dark Blue
-        secondary: darkGrey, // Dark Grey
-        tertiary: lightGrey, // Light Grey
+        primary: darkBlue,
+        secondary: darkGrey,
+        tertiary: lightGrey,
         surface: lightGrey,
         background: lightGrey,
         error: lightRed,
@@ -36,4 +52,10 @@ class ThemeModel {
       useMaterial3: true,
     );
   }
+
+  static TextStyle titleLargeTextStyle = const TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    color: darkBlue,
+  );
 }

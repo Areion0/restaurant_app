@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/product/appbar.dart';
 import 'package:restaurant_app/widgets/image_button.dart';
+import 'package:restaurant_app/widgets/item_gallery.dart';
 import 'package:restaurant_app/widgets/page_blueprint.dart';
 
 class ProductPage extends StatefulWidget {
@@ -32,19 +34,56 @@ class _ProductPageState extends State<ProductPage> {
                   // Image
                   Container(height: 200, child: const ImageButton()),
 
-                  // Description
-                  Text(
-                      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc nisl aliquet nunc, vitae aliquam nisl nunc eu nisl. Donec euismod, nisl eget ultricies aliquam, nunc nisl aliquet nunc, vitae aliquam nisl nunc eu nisl."),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Description
+                        Text(
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec euismod, nisl eget ultricies aliquam, nunc nisl aliquet nunc, vitae aliquam nisl nunc eu nisl. ",
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          "Donec euismod, nisl eget ultricies aliquam, nunc nisl aliquet nunc, vitae aliquam nisl nunc eu nisl.",
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          "Donec euismod, nisl eget ultricies aliquam, nunc nisl aliquet nunc, vitae aliquam nisl nunc eu nisl.",
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
 
                   // Price
+                  Text(
+                    "€ 7.50",
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+
+                  const SizedBox(height: 20),
 
                   // Add to cart
+                  Container(
+                    height: 65,
+                    width: context.mediaQuery.size.width * 0.6,
+                    child: ElevatedButton(
+                      onPressed: () {},
+                      child: const Text("Add To Cart"),
+                    ),
+                  ),
 
-                  // Reviews
-
-                  // Similar products
+                  const SizedBox(height: 60),
                 ],
               ),
+            ),
+            // Similar products
+            const ItemGallery(
+              title: "Combine With 🍗 + 🥗",
+              items: ["", "", "", ""],
             )
           ],
         ),

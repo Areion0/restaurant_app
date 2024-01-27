@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/cart/cart_view.dart';
+import 'package:restaurant_app/misc/extensions.dart';
 
 import '../theme/theme_model.dart';
 
@@ -74,9 +76,7 @@ class HomeAppbar extends StatelessWidget {
             Icons.shopping_cart_outlined,
             size: 34,
           ),
-          onPressed: () {
-            log('Cart Tapped');
-          },
+          onPressed: () => context.push(const CartView()),
         ),
       ],
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/widgets/item_gallery.dart';
 import 'package:restaurant_app/widgets/page_blueprint.dart';
 
@@ -59,16 +60,16 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         children: [
           const Padding(
-            padding: EdgeInsets.only(right: 30),
+            padding: EdgeInsets.only(right: 20),
             child: HomeAppbar(),
           ),
           const SizedBox(height: 20),
           Container(
-            height: 800,
+            height: context.mediaQuery.size.height * 0.85,
             child: ListView.separated(
               itemCount: items.length,
               itemBuilder: (context, index) => Padding(
-                padding: EdgeInsets.only(right: index == 0 ? 30 : 0),
+                padding: EdgeInsets.only(right: index == 0 ? 20 : 0),
                 child: ItemGallery(
                   title: titles[index],
                   prefix: prefixes[index],
