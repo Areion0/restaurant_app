@@ -57,6 +57,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: PageBlueprint(
+      isHome: true,
       child: Column(
         children: [
           const Padding(
