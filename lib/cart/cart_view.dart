@@ -17,45 +17,53 @@ class _CartViewState extends State<CartView> {
   late CartController controller;
 
   @override
-  Widget build(BuildContext context) {
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
     controller = context.watch<CartController>();
 
+    if (!controller.initialized) controller.init();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: PageBlueprint(
-          child: Padding(
-        padding: const EdgeInsets.only(right: 10),
-        child: Column(
-          children: [
-            const CartAppbar(),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.only(right: 20),
-              child: Column(
-                children: [
-                  Container(
-                    height: context.mediaQuery.size.height * 0.7,
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: ThemeModel.darkGrey),
-                    child: ListView.separated(
-                        itemBuilder: (context, index) => controller.items[index],
-                        separatorBuilder: (context, index) => const SizedBox(
-                              height: 20,
-                            ),
-                        itemCount: controller.items.length),
+          child: Column(
+        children: [
+          const CartAppbar(),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: Column(
+              children: [
+                Container(
+                  height: context.mediaQuery.size.height * 0.7,
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: ThemeModel.darkGrey),
+                  child: ListView.separated(
+                      itemBuilder: (context, index) => Padding(
+                            padding: EdgeInsets.only(
+                                top: index == 0 ? 20 : 0, bottom: index == controller.items.length - 1 ? 20 : 0),
+                            child: controller.items[index],
+                          ),
+                      separatorBuilder: (context, index) => const SizedBox(
+                            height: 20,
+                          ),
+                      itemCount: controller.items.length),
+                ),
+                SizedBox(height: context.mediaQuery.size.height * 0.04),
+                Container(
+                  height: 65,
+                  width: context.mediaQuery.size.width * 0.6,
+                  child: ElevatedButton(
+                    onPressed: () {},
+                    child: const Text("Checkout"),
                   ),
-                  SizedBox(height: context.mediaQuery.size.height * 0.04),
-                  Container(
-                    height: 65,
-                    width: context.mediaQuery.size.width * 0.6,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      child: const Text("Checkout"),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          ],
-        ),
+                ),
+              ],
+            ),
+          )
+        ],
       )),
     );
   }
