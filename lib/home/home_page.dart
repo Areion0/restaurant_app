@@ -1,10 +1,18 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/firebase/firestore_controller.dart';
+import 'package:restaurant_app/firebase/storage_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
+import 'package:restaurant_app/widgets/custom_appbar.dart';
 import 'package:restaurant_app/widgets/item_gallery.dart';
 import 'package:restaurant_app/widgets/page_blueprint.dart';
 
+import '../cart/cart_view.dart';
+import '../models/product.dart';
+import '../product/product_page.dart';
 import '../theme/theme_model.dart';
-import 'appbar.dart';
+import '../widgets/image_button.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,13 +22,40 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool firstTime = true;
+
+  List<Map<String, dynamic>> products = [];
+
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     super.didChangeDependencies();
+
+    if (firstTime) {
+      firstTime = false;
+
+      products = await FirestoreController.getProducts();
+      items = await Future.wait(
+        products.map(
+          (product) async {
+            var imageURL = await StorageController.getFileURL(product["imageID"].toString());
+
+            return ImageButton(
+              imageUrl: imageURL,
+              onTap: () => context.push(
+                ProductPage(product: Product.fromMap(product, imageURL: imageURL)),
+              ),
+            );
+          },
+        ),
+      );
+      setState(() {});
+
+      log('Products: $items');
+    }
   }
 
   List<String> titles = [
-    "Last Order",
+    "Recent Orders",
     "Most Popular",
     "Just Added",
     "Recommended",
@@ -46,42 +81,80 @@ class _HomePageState extends State<HomePage> {
     ),
   ];
 
-  List<List<String>> items = [
-    [""],
-    ["", "", "", ""],
-    ["", "", "", ""],
-    ["", "", "", ""],
-  ];
+  List<ImageButton> items = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: PageBlueprint(
-      isHome: true,
-      child: Column(
-        children: [
-          const Padding(
-            padding: EdgeInsets.only(right: 20),
-            child: HomeAppbar(),
-          ),
-          const SizedBox(height: 20),
-          Container(
-            height: context.mediaQuery.size.height * 0.85,
-            child: ListView.separated(
-              itemCount: items.length,
-              itemBuilder: (context, index) => Padding(
-                padding: EdgeInsets.only(right: index == 0 ? 20 : 0),
-                child: ItemGallery(
-                  title: titles[index],
-                  prefix: prefixes[index],
-                  items: items[index],
+        appBar: CustomAppbar(
+          leading: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              InkWell(
+                borderRadius: BorderRadius.circular(50),
+                onTap: () {
+                  log('Profile Image Tapped');
+                },
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: ThemeModel.darkGrey,
+                      width: 3,
+                    ),
+                    borderRadius: BorderRadius.circular(50),
+                    color: ThemeModel.darkBlue,
+                  ),
                 ),
               ),
-              separatorBuilder: (context, index) => const SizedBox(height: 30),
-            ),
+              const SizedBox(width: 10),
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'John',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    'Doe',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
-      ),
-    ));
+          icon: const Icon(
+            Icons.shopping_cart_outlined,
+            size: 35,
+          ),
+          onPressed: () => context.push(const CartView()),
+        ),
+        body: PageBlueprint(
+          isHome: true,
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              Container(
+                height: context.mediaQuery.size.height * 0.85,
+                child: ListView.separated(
+                  itemCount: items.length,
+                  itemBuilder: (context, index) => ItemGallery(
+                    title: titles[index],
+                    prefix: prefixes[index],
+                    items: items,
+                  ),
+                  separatorBuilder: (context, index) => const SizedBox(height: 30),
+                ),
+              ),
+            ],
+          ),
+        ));
   }
 }

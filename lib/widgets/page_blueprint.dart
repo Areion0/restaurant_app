@@ -18,11 +18,7 @@ class _PageBlueprintState extends State<PageBlueprint> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.only(
-          left: 30,
-          top: 20,
-          right: widget.isHome ? 0 : 10,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 25),
         child: widget.child,
       ),
     );
