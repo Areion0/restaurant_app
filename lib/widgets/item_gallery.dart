@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:restaurant_app/misc/extensions.dart';
-import 'package:restaurant_app/product/product_page.dart';
 import 'package:restaurant_app/widgets/image_button.dart';
 
 class ItemGallery extends StatelessWidget {
   final String title;
   final Widget? prefix;
-  final List items;
+  final List<ImageButton> items;
   const ItemGallery({required this.title, this.prefix, required this.items, super.key});
 
   @override
@@ -36,18 +34,12 @@ class ItemGallery extends StatelessWidget {
         Container(
           height: 120,
           child: items.length == 1
-              ? ImageButton(
-                  onTap: () => context.push(const ProductPage()),
-                )
+              ? items[0]
               : ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: items.length,
                   itemBuilder: (context, index) {
-                    return Container(
-                        width: 140,
-                        child: ImageButton(
-                          onTap: () => context.push(const ProductPage()),
-                        ));
+                    return Container(width: 140, child: items[index]);
                   },
                 ),
         )

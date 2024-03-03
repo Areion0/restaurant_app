@@ -14,4 +14,20 @@ class FirestoreController {
 
     return list;
   }
+
+  static Future<Map<String, dynamic>> getDocument(String collection, String id) async {
+    var db = FirebaseFirestore.instance;
+
+    Map<String, dynamic> data = {};
+
+    await db.collection(collection).doc(id).get().then((doc) {
+      data = doc.data() ?? {};
+    });
+
+    return data;
+  }
+
+  static Future<List<Map<String, dynamic>>> getProducts() async {
+    return (await getCollection('products')).cast<Map<String, dynamic>>();
+  }
 }

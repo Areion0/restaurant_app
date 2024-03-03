@@ -9,6 +9,9 @@ extension ExtensionForBuildContext on BuildContext {
   /// Returns the [MediaQueryData] of the current [BuildContext].
   MediaQueryData get mediaQuery => MediaQuery.of(this);
 
+  double get height => mediaQuery.size.height;
+  double get width => mediaQuery.size.width;
+
   /// Returns the [NavigatorState] of the current [BuildContext].
   NavigatorState get navigator => Navigator.of(this);
 
