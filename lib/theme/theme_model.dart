@@ -8,50 +8,48 @@ class ThemeModel {
   static const darkRed = Color(0xFFBB2222);
   static const lightRed = Color(0xFFEF233C);
 
-  static ThemeData get theme {
-    return ThemeData(
-      fontFamily: GoogleFonts.inter().fontFamily,
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: darkRed,
-          foregroundColor: lightGrey,
-          textStyle: titleLargeTextStyle,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+  static ThemeData get theme => ThemeData(
+        fontFamily: GoogleFonts.inter().fontFamily,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: darkRed,
+            foregroundColor: lightGrey,
+            textStyle: titleLargeTextStyle,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
           ),
         ),
-      ),
-      textTheme: TextTheme(
-        titleLarge: titleLargeTextStyle,
-        titleMedium: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color: darkBlue,
+        textTheme: TextTheme(
+          titleLarge: titleLargeTextStyle,
+          titleMedium: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: darkBlue,
+          ),
+          bodyMedium: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: darkBlue,
+          ),
         ),
-        bodyMedium: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.bold,
-          color: darkBlue,
+        iconTheme: const IconThemeData(size: 34),
+        colorScheme: const ColorScheme(
+          primary: darkBlue,
+          secondary: darkGrey,
+          tertiary: lightGrey,
+          surface: lightGrey,
+          background: lightGrey,
+          error: lightRed,
+          onPrimary: lightGrey,
+          onSecondary: lightGrey,
+          onSurface: darkBlue,
+          onBackground: darkBlue,
+          onError: darkBlue,
+          brightness: Brightness.light,
         ),
-      ),
-      iconTheme: const IconThemeData(size: 34),
-      colorScheme: const ColorScheme(
-        primary: darkBlue,
-        secondary: darkGrey,
-        tertiary: lightGrey,
-        surface: lightGrey,
-        background: lightGrey,
-        error: lightRed,
-        onPrimary: lightGrey,
-        onSecondary: lightGrey,
-        onSurface: darkBlue,
-        onBackground: darkBlue,
-        onError: darkBlue,
-        brightness: Brightness.light,
-      ),
-      useMaterial3: true,
-    );
-  }
+        useMaterial3: true,
+      );
 
   static TextStyle titleLargeTextStyle = const TextStyle(
     fontSize: 24,

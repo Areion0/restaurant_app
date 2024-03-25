@@ -19,35 +19,33 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(60);
 
   @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      centerTitle: true,
-      automaticallyImplyLeading: false,
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(20),
-        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Row(
-            children: [
-              const SizedBox(width: 20),
-              leading ??
-                  IconButton(
-                    onPressed: () => context.pop(),
-                    icon: const Icon(Icons.arrow_back, size: 35),
-                  ),
-            ],
-          ),
-          title ?? const SizedBox(),
-          Row(
-            children: [
-              IconButton(
-                onPressed: () => onPressed(),
-                icon: icon,
-              ),
-              const SizedBox(width: 20),
-            ],
-          ),
-        ]),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => AppBar(
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(20),
+          child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Row(
+              children: [
+                const SizedBox(width: 20),
+                leading ??
+                    IconButton(
+                      onPressed: () => context.pop(),
+                      icon: const Icon(Icons.arrow_back, size: 35),
+                    ),
+              ],
+            ),
+            title ?? const SizedBox(),
+            Row(
+              children: [
+                IconButton(
+                  onPressed: () => onPressed(),
+                  icon: icon,
+                ),
+                const SizedBox(width: 20),
+              ],
+            ),
+          ]),
+        ),
+      );
 }

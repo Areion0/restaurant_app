@@ -143,15 +143,17 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 20),
               Container(
                 height: context.mediaQuery.size.height * 0.85,
-                child: ListView.separated(
-                  itemCount: items.length,
-                  itemBuilder: (context, index) => ItemGallery(
-                    title: titles[index],
-                    prefix: prefixes[index],
-                    items: items,
-                  ),
-                  separatorBuilder: (context, index) => const SizedBox(height: 30),
+                child:
+                    // ListView.separated(
+                    // itemCount: items.length,
+                    // itemBuilder: (context, index) =>
+                    ItemGallery(
+                  title: titles[0],
+                  prefix: prefixes[0],
+                  items: items,
                 ),
+                // separatorBuilder: (context, index) => const SizedBox(height: 30),
+                // ),
               ),
             ],
           ),

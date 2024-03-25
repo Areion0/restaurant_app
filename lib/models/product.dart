@@ -7,8 +7,15 @@ class Product {
   Product({required this.name, required this.description, required this.price, this.imageURL});
 
   Product.fromMap(Map<String, dynamic> map, {this.imageURL}) {
-    name = map["Name"];
-    description = map["Description"];
-    price = map["Price"];
+    name = map["name"];
+    description = map["description"] ?? "";
+    price = map["price"];
   }
+
+  Map<String, dynamic> toMap() => {
+        "name": name,
+        "description": description,
+        "price": price,
+        "imageID": imageURL ?? "",
+      };
 }
