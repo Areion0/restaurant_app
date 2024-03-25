@@ -27,7 +27,12 @@ class FirestoreController {
     return data;
   }
 
-  static Future<List<Map<String, dynamic>>> getProducts() async {
-    return (await getCollection('products')).cast<Map<String, dynamic>>();
+  static Future<List<Map<String, dynamic>>> getProducts() async =>
+      (await getCollection('products')).cast<Map<String, dynamic>>();
+
+  static Future<DocumentReference<Map<String, dynamic>>> addProduct(Map<String, dynamic> product) async {
+    var db = FirebaseFirestore.instance;
+
+    return await db.collection('products').add(product);
   }
 }
