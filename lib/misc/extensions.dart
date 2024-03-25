@@ -19,13 +19,28 @@ extension ExtensionForBuildContext on BuildContext {
   void pop() => navigator.pop();
 
   /// Pushes the given route
-  void push(Widget route) => navigator.push(
-        MaterialPageRoute(builder: (_) => route),
-      );
+  void push(Widget route) => navigator.push(animatedPageRoute(route));
 
   /// Pushes the given route and removes all the previous routes
   void pushAndRemoveAll(Widget route) => navigator.pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => route),
+        animatedPageRoute(route),
         (route) => false,
       );
 }
+
+// Animated Page Route function
+PageRouteBuilder animatedPageRoute(Widget route) => PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => route,
+      transitionDuration: const Duration(milliseconds: 150),
+      reverseTransitionDuration: const Duration(milliseconds: 150),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        var begin = const Offset(1, 0);
+        var end = Offset.zero;
+        var tween = Tween(begin: begin, end: end);
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );

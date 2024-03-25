@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class PageBlueprint extends StatefulWidget {
   final Widget child;
   final bool isHome;
+  final EdgeInsets? padding;
   const PageBlueprint({
     super.key,
     required this.child,
     this.isHome = false,
+    this.padding,
   });
 
   @override
@@ -18,7 +20,7 @@ class _PageBlueprintState extends State<PageBlueprint> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 25),
+        padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 25),
         child: widget.child,
       ),
     );
