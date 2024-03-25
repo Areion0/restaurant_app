@@ -15,66 +15,82 @@ class CartView extends StatefulWidget {
 }
 
 class _CartViewState extends State<CartView> {
-  late CartController controller;
+  late CartController cart;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    controller = context.watch<CartController>();
+    cart = context.watch<CartController>();
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppbar(
-        title: const Text(
-          "Order Summary",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+  Widget build(BuildContext context) => Scaffold(
+        appBar: CustomAppbar(
+          title: Text(
+            "Order Summary",
+            style: ThemeModel.theme.textTheme.titleMedium,
           ),
+          icon: const Icon(Icons.remove_shopping_cart_outlined, color: ThemeModel.darkRed, size: 35),
+          onPressed: () {
+            cart.clear();
+            if (cart.items.isEmpty) context.pop();
+          },
         ),
-        icon: const Icon(Icons.remove_shopping_cart_outlined, color: ThemeModel.darkRed, size: 35),
-        onPressed: () => controller.clear(),
-      ),
-      body: PageBlueprint(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          if (controller.items.isEmpty)
-            const Center(child: CircularProgressIndicator())
-          else ...[
-            Column(
+        body: PageBlueprint(
+            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Container(
-                  height: context.mediaQuery.size.height * 0.7,
-                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: ThemeModel.darkGrey),
-                  child: ListView.separated(
-                      itemBuilder: (context, index) => Padding(
-                            padding: EdgeInsets.only(
-                                top: index == 0 ? 20 : 0, bottom: index == controller.items.length - 1 ? 20 : 0),
-                            child: controller.items[index],
-                          ),
-                      separatorBuilder: (context, index) => const SizedBox(
-                            height: 20,
-                          ),
-                      itemCount: controller.items.length),
-                ),
-                SizedBox(height: context.mediaQuery.size.height * 0.04),
-                Container(
-                  height: 65,
-                  width: context.mediaQuery.size.width * 0.6,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    child: const Text("Checkout"),
-                  ),
-                ),
+                Column(
+                  children: [
+                    Container(
+                      height: context.mediaQuery.size.height * 0.7,
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: ThemeModel.darkGrey),
+                      child: cart.items.isEmpty
+                          ? const Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Your cart is empty",
+                                    style: TextStyle(
+                                      color: ThemeModel.lightGrey,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Icon(
+                                    Icons.shopping_cart_outlined,
+                                    color: ThemeModel.lightGrey,
+                                    size: 50,
+                                  ),
+                                ],
+                              ),
+                            )
+                          : ListView.separated(
+                              itemBuilder: (context, index) => Padding(
+                                    padding: EdgeInsets.only(
+                                        top: index == 0 ? 20 : 0, bottom: index == cart.items.length - 1 ? 20 : 0),
+                                    child: cart.items[index],
+                                  ),
+                              separatorBuilder: (context, index) => const SizedBox(
+                                    height: 20,
+                                  ),
+                              itemCount: cart.items.length),
+                    ),
+                    SizedBox(height: context.mediaQuery.size.height * 0.04),
+                    Container(
+                      height: 65,
+                      width: context.mediaQuery.size.width * 0.6,
+                      child: ElevatedButton(
+                        onPressed: cart.items.isEmpty ? null : () => context.pop(),
+                        child: const Text("Checkout"),
+                      ),
+                    ),
+                  ],
+                )
               ],
-            )
-          ]
-        ],
-      )),
-    );
-  }
+            )),
+      );
 }
