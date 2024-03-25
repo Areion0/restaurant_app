@@ -1,11 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/widgets/custom_appbar.dart';
 import 'package:restaurant_app/widgets/image_button.dart';
 import 'package:restaurant_app/widgets/item_gallery.dart';
 import 'package:restaurant_app/widgets/page_blueprint.dart';
 
+import '../cart/cart_controller.dart';
+import '../cart/cart_item.dart';
 import '../models/product.dart';
 import '../theme/theme_model.dart';
 
@@ -30,10 +33,7 @@ class _ProductPageState extends State<ProductPage> {
           ),
           title: Text(
             widget.product.name,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+            style: ThemeModel.theme.textTheme.titleMedium,
           ),
           onPressed: () {
             setState(() {
@@ -74,18 +74,24 @@ class _ProductPageState extends State<ProductPage> {
                         height: 65,
                         width: context.mediaQuery.size.width * 0.6,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            context.read<CartController>().add(CartItem(product: widget.product));
+                            context.pop();
+                          },
                           child: RichText(
                             text: TextSpan(
                               text: "Add To Cart",
                               style: Theme.of(context)
                                   .textTheme
                                   .titleLarge!
-                                  .copyWith(fontWeight: FontWeight.normal, color: ThemeModel.lightGrey),
+                                  .copyWith(fontSize: 22, fontWeight: FontWeight.normal, color: ThemeModel.lightGrey),
                               children: [
                                 TextSpan(
                                   text: " € ${widget.product.price}",
-                                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleLarge!
+                                      .copyWith(fontSize: 22, color: ThemeModel.lightGrey),
                                 ),
                               ],
                             ),

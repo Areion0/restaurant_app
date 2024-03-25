@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/theme/theme_model.dart';
 
 import '../models/product.dart';
+import 'cart_controller.dart';
 
 class CartItem extends StatelessWidget {
   final Product product;
@@ -21,7 +23,8 @@ class CartItem extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: width * 0.31,
+              width: width * 0.25,
+              height: width * 0.25,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 color: ThemeModel.darkBlue,
@@ -29,7 +32,7 @@ class CartItem extends StatelessWidget {
             ),
             SizedBox(width: width * 0.05),
             Container(
-              width: width * 0.53,
+              width: width * 0.6,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,15 +46,25 @@ class CartItem extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Name
-                          Text(
-                            product.name,
-                            style: const TextStyle(color: ThemeModel.darkBlue, fontSize: 16),
+                          Container(
+                            width: width * 0.45,
+                            child: Text(
+                              product.name,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: const TextStyle(color: ThemeModel.darkBlue, fontSize: 16),
+                            ),
                           ),
 
                           // Description
-                          Text(
-                            product.description,
-                            style: const TextStyle(color: ThemeModel.darkGrey, fontSize: 12),
+                          Container(
+                            width: width * 0.45,
+                            child: Text(
+                              product.description,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                              style: const TextStyle(color: ThemeModel.darkGrey, fontSize: 12),
+                            ),
                           )
                         ],
                       ),
@@ -61,7 +74,10 @@ class CartItem extends StatelessWidget {
                         height: 35,
                         width: 35,
                         child: IconButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            context.read<CartController>().remove(this);
+                            if (context.read<CartController>().items.isEmpty) context.pop();
+                          },
                           icon: const Icon(
                             Icons.remove_circle_outline,
                             color: ThemeModel.darkRed,
