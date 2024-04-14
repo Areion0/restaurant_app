@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/theme/theme_model.dart';
+import 'package:restaurant_app/widgets/rectangle_box.dart';
 
 import '../models/product.dart';
 import 'cart_controller.dart';
@@ -15,11 +16,9 @@ class CartItem extends StatelessWidget {
     double width = context.mediaQuery.size.width * 0.75;
 
     return Center(
-      child: Container(
+      child: RectangleBox(
         height: context.mediaQuery.size.height * 0.13,
         width: width,
-        padding: const EdgeInsets.all(15),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: ThemeModel.lightGrey),
         child: Row(
           children: [
             Container(
