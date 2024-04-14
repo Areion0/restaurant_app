@@ -27,6 +27,11 @@ class ThemeModel {
             fontWeight: FontWeight.bold,
             color: darkBlue,
           ),
+          bodyLarge: const TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.bold,
+            color: darkBlue,
+          ),
           bodyMedium: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.bold,

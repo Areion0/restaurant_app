@@ -5,15 +5,15 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   const CustomAppbar({
     this.leading,
     this.title,
-    required this.icon,
-    required this.onPressed,
+    this.icon,
+    this.onPressed,
     super.key,
   });
 
   final Widget? leading;
   final Widget? title;
-  final Icon icon;
-  final Function onPressed;
+  final Icon? icon;
+  final void Function()? onPressed;
 
   @override
   Size get preferredSize => const Size.fromHeight(60);
@@ -36,15 +36,18 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
               ],
             ),
             title ?? const SizedBox(),
-            Row(
-              children: [
-                IconButton(
-                  onPressed: () => onPressed(),
-                  icon: icon,
-                ),
-                const SizedBox(width: 20),
-              ],
-            ),
+            if (icon != null)
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: onPressed,
+                    icon: icon!,
+                  ),
+                  const SizedBox(width: 20),
+                ],
+              )
+            else
+              const SizedBox(width: 60),
           ]),
         ),
       );
