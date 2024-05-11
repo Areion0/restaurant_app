@@ -9,15 +9,19 @@ import 'cart_controller.dart';
 
 class CartItem extends StatelessWidget {
   final Product product;
-  const CartItem({required this.product, super.key});
+  const CartItem({
+    required this.product,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     double width = context.mediaQuery.size.width * 0.75;
+    double height = context.mediaQuery.size.height * 0.13;
 
     return Center(
       child: RectangleBox(
-        height: context.mediaQuery.size.height * 0.13,
+        height: height,
         width: width,
         child: Row(
           children: [
@@ -95,7 +99,7 @@ class CartItem extends StatelessWidget {
                         const Text("x1"),
 
                         // Price
-                        Text("\$ ${product.price}"),
+                        Text(product.price.price),
                       ],
                     ),
                   )

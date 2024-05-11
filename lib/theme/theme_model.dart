@@ -33,6 +33,11 @@ class ThemeModel {
             color: darkBlue,
           ),
           bodyMedium: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: darkBlue,
+          ),
+          bodySmall: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.bold,
             color: darkBlue,
@@ -61,4 +66,20 @@ class ThemeModel {
     fontWeight: FontWeight.bold,
     color: darkBlue,
   );
+}
+
+extension TextStyleExtension on TextStyle {
+  TextStyle get light => copyWith(color: ThemeModel.lightGrey);
+
+  TextStyle get dark => copyWith(color: ThemeModel.darkBlue);
+
+  TextStyle get red => copyWith(color: ThemeModel.darkRed);
+}
+
+extension StringFormattingExtension on String {
+  String get price => '€ $this';
+}
+
+extension DoubleFormattingExtension on double {
+  String get price => toStringAsFixed(2).price;
 }
