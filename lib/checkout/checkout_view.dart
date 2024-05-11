@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/cart/cart_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/widgets/rectangle_box.dart';
 
@@ -14,6 +16,15 @@ class CheckoutView extends StatefulWidget {
 }
 
 class _CheckoutViewState extends State<CheckoutView> {
+  late CartController cart;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    cart = context.watch<CartController>();
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: CustomAppbar(
@@ -24,7 +35,7 @@ class _CheckoutViewState extends State<CheckoutView> {
         ),
         body: PageBlueprint(
           padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-          child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+          child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Container(
               height: context.mediaQuery.size.height * 0.3,
               decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: ThemeModel.darkGrey),
@@ -136,6 +147,112 @@ class _CheckoutViewState extends State<CheckoutView> {
                 ),
               ),
             ),
+            Container(
+              height: context.mediaQuery.size.height * 0.4,
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: ThemeModel.darkGrey),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  children: [
+                    Container(
+                      height: (context.mediaQuery.size.height * 0.4) * 0.65,
+                      child: ListView.separated(
+                          itemBuilder: (context, index) => Padding(
+                                padding: EdgeInsets.only(
+                                    top: index == 0 ? 20 : 0, bottom: index == cart.compactItems.length - 1 ? 20 : 0),
+                                child: cart.compactItems[index],
+                              ),
+                          separatorBuilder: (context, index) => const SizedBox(
+                                height: 20,
+                              ),
+                          itemCount: cart.compactItems.length),
+                    ),
+
+                    // Separator
+                    const Divider(
+                      color: ThemeModel.lightGrey,
+                      thickness: 3,
+                    ),
+
+                    // Price Summary
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Items
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Dishes",
+                                style: ThemeModel.theme.textTheme.bodyLarge?.light,
+                              ),
+                              Text(
+                                cart.totalPrice.price,
+                                style: ThemeModel.theme.textTheme.bodyLarge?.light,
+                              ),
+                            ],
+                          ),
+
+                          // VAT
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  text: "VAT",
+                                  style: ThemeModel.theme.textTheme.bodyLarge?.light,
+                                  children: [
+                                    TextSpan(
+                                      text: "24%",
+                                      style: ThemeModel.theme.textTheme.bodySmall?.light,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Text(
+                                (cart.totalPrice * 0.24).price,
+                                style: ThemeModel.theme.textTheme.bodyLarge?.light,
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          // Total
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Total",
+                                style: ThemeModel.theme.textTheme.bodyLarge?.light,
+                              ),
+                              Text(
+                                (cart.totalPrice * 1.24).price,
+                                style: ThemeModel.theme.textTheme.bodyLarge?.light,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Submit Button
+            Container(
+              height: 65,
+              width: context.mediaQuery.size.width * 0.6,
+              child: ElevatedButton(
+                onPressed: () {},
+                child: const Text("Submit"),
+              ),
+            ),
+
+            const SizedBox()
           ]),
         ),
       );
