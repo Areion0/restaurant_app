@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/cart/cart_controller.dart';
+import 'package:restaurant_app/firebase/firestore_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
+import 'package:restaurant_app/models/customer_order.dart';
 import 'package:restaurant_app/widgets/rectangle_box.dart';
+import 'package:slide_to_act/slide_to_act.dart';
 
 import '../theme/theme_model.dart';
 import '../widgets/custom_appbar.dart';
@@ -244,13 +247,28 @@ class _CheckoutViewState extends State<CheckoutView> {
 
             // Submit Button
             Container(
-              height: 65,
-              width: context.mediaQuery.size.width * 0.6,
-              child: ElevatedButton(
-                onPressed: () {},
-                child: const Text("Submit"),
-              ),
-            ),
+                height: 65,
+                width: context.mediaQuery.size.width * 0.6,
+                child: SlideAction(
+                  sliderButtonIconPadding: 12,
+                  sliderRotate: false,
+                  innerColor: ThemeModel.lightGrey,
+                  onSubmit: () async {
+                    var products = cart.items.map((item) => item.product).toList();
+
+                    await FirestoreController.submitOrder(
+                      CustomerOrder(
+                        date: DateTime.now(),
+                        products: products,
+                        total: products.fold(0.0, (sum, product) => sum + product.price),
+                        customerID: "0",
+                        status: "Pending",
+                      ),
+                    );
+                  },
+                  text: "Submit",
+                  textStyle: ThemeModel.titleLargeTextStyle.light,
+                )),
 
             const SizedBox()
           ]),
