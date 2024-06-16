@@ -1,4 +1,9 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../models/customer_order.dart';
 
 class FirestoreController {
   static Future<List> getCollection(String collection) async {
@@ -34,5 +39,26 @@ class FirestoreController {
     var db = FirebaseFirestore.instance;
 
     return await db.collection('products').add(product);
+  }
+
+  static Future<void> submitOrder(CustomerOrder customerOrder) async {
+    Map<String, dynamic> order = customerOrder.toMap();
+
+    try {
+      var db = FirebaseFirestore.instance;
+
+      Future<void> firestoreOperation = db.collection('orders').add(order);
+
+      await firestoreOperation.timeout(
+        const Duration(seconds: 5),
+        onTimeout: () {
+          throw TimeoutException("The operation has timed out.");
+        },
+      );
+
+      log("Order added successfully");
+    } catch (e) {
+      log('Error submitting order: $e');
+    }
   }
 }
