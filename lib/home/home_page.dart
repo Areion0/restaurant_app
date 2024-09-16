@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/firebase/firestore_controller.dart';
-import 'package:restaurant_app/firebase/storage_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/widgets/custom_appbar.dart';
 import 'package:restaurant_app/widgets/item_gallery.dart';
@@ -24,7 +23,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool firstTime = true;
 
-  List<Map<String, dynamic>> products = [];
+  List<Product> products = [];
 
   @override
   void didChangeDependencies() async {
@@ -37,12 +36,10 @@ class _HomePageState extends State<HomePage> {
       items = await Future.wait(
         products.map(
           (product) async {
-            var imageURL = await StorageController.getFileURL(product["imageID"].toString());
-
             return ImageButton(
-              imageUrl: imageURL,
+              imageUrl: product.imageURL ?? "",
               onTap: () => context.push(
-                ProductPage(product: Product.fromMap(product, imageURL: imageURL)),
+                ProductPage(product: product),
               ),
             );
           },

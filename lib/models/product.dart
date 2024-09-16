@@ -2,6 +2,7 @@ class Product {
   late final String name;
   late final String description;
   late final double price;
+  String? imageID;
   String? imageURL;
 
   Product({required this.name, required this.description, required this.price, this.imageURL});
@@ -10,12 +11,14 @@ class Product {
     name = map["name"];
     description = map["description"] ?? "";
     price = map["price"];
+    imageID = map["imageID"];
   }
 
   Map<String, dynamic> toMap() => {
         "name": name,
         "description": description,
         "price": price,
-        "imageID": imageURL ?? "",
+        "imageID": imageID ?? "",
+        "imageURL": imageURL ?? "",
       };
 }
