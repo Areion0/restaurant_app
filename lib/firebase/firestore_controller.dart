@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:restaurant_app/models/product.dart';
 
 import '../models/customer_order.dart';
+import 'storage_controller.dart';
 
 class FirestoreController {
   static Future<List> getCollection(String collection) async {
@@ -32,8 +34,17 @@ class FirestoreController {
     return data;
   }
 
-  static Future<List<Map<String, dynamic>>> getProducts() async =>
-      (await getCollection('products')).cast<Map<String, dynamic>>();
+  static Future<List<Product>> getProducts() async {
+    var productList = await getCollection('products');
+    List<Product> products = [];
+
+    for (var productData in productList.cast<Map<String, dynamic>>()) {
+      var imageURL = await StorageController.getFileURL(productData["imageID"] ?? "") ?? "";
+      products.add(Product.fromMap(productData, imageURL: imageURL));
+    }
+
+    return products;
+  }
 
   static Future<DocumentReference<Map<String, dynamic>>> addProduct(Map<String, dynamic> product) async {
     var db = FirebaseFirestore.instance;
