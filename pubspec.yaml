@@ -39,7 +39,12 @@ dependencies:
   cloud_firestore: ^5.4.1
   firebase_storage: ^12.3.0
   cached_network_image: ^3.3.1
-  slide_to_act: ^2.0.2
+  slide_to_act:
+    git:
+      url: https://github.com/Areion0/flutter-slide-to-act.git
+      ref: master
+  logger: ^2.4.0
+  fluttertoast: ^8.2.8
 
 dev_dependencies:
   flutter_test:
