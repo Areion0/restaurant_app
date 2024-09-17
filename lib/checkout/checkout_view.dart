@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/cart/cart_controller.dart';
-import 'package:restaurant_app/firebase/firestore_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
-import 'package:restaurant_app/models/customer_order.dart';
 import 'package:restaurant_app/widgets/rectangle_box.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 
@@ -253,19 +251,10 @@ class _CheckoutViewState extends State<CheckoutView> {
                   sliderButtonIconPadding: 12,
                   sliderRotate: false,
                   innerColor: ThemeModel.lightGrey,
-                  onSubmit: () async {
-                    var products = cart.items.map((item) => item.product).toList();
-
-                    await FirestoreController.submitOrder(
-                      CustomerOrder(
-                        date: DateTime.now(),
-                        products: products,
-                        total: products.fold(0.0, (sum, product) => sum + product.price),
-                        customerID: "0",
-                        status: "Pending",
-                      ),
-                    );
-                  },
+                  submittedIcon: const CircularProgressIndicator(
+                    strokeWidth: 5.5,
+                  ),
+                  onSubmit: () => cart.onSubmit(context),
                   text: "Submit",
                   textStyle: ThemeModel.titleLargeTextStyle.light,
                 )),

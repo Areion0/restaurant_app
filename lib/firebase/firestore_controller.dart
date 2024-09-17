@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:logger/logger.dart';
 import 'package:restaurant_app/models/product.dart';
 
 import '../models/customer_order.dart';
@@ -67,9 +67,9 @@ class FirestoreController {
         },
       );
 
-      log("Order added successfully");
+      Logger().i("Order submitted successfully");
     } catch (e) {
-      log('Error submitting order: $e');
+      Logger().i('Error submitting order: $e');
     }
   }
 }

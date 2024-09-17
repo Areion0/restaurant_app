@@ -1,8 +1,14 @@
 // ignore_for_file: prefer_final_fields
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:logger/logger.dart';
 import 'package:restaurant_app/cart/cart_item_compact.dart';
+import 'package:restaurant_app/misc/extensions.dart';
 
+import '../firebase/firestore_controller.dart';
+import '../models/customer_order.dart';
+import '../models/product.dart';
 import 'cart_item.dart';
 
 class CartController extends ChangeNotifier {
@@ -36,4 +42,26 @@ class CartController extends ChangeNotifier {
   }
 
   double get totalPrice => _items.fold(0, (previousValue, element) => previousValue + element.product.price);
+
+  Future<void> onSubmit(BuildContext context) async {
+    List<Product> products = items.map((item) => item.product).toList();
+
+    Logger().i("Sending order with ${products.length} products...");
+
+    await FirestoreController.submitOrder(
+      CustomerOrder(
+        date: DateTime.now(),
+        products: products,
+        total: products.fold(0.0, (sum, product) => sum + product.price),
+        customerID: "2",
+        status: "Test",
+      ),
+    );
+
+    Fluttertoast.showToast(msg: "✅ Order submitted!");
+
+    if (context.mounted) context.goHome();
+
+    clear();
+  }
 }

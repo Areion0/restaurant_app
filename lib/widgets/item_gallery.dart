@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/theme/theme_model.dart';
 import 'package:restaurant_app/widgets/image_button.dart';
 
 class ItemGallery extends StatelessWidget {
@@ -33,8 +34,12 @@ class ItemGallery extends StatelessWidget {
         // Image Buttons
         Container(
           height: 120,
-          child: items.length == 1
-              ? items[0]
+          child: items.isEmpty
+              ? const Center(
+                  child: CircularProgressIndicator(
+                    color: ThemeModel.darkBlue,
+                  ),
+                )
               : ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: items.length,

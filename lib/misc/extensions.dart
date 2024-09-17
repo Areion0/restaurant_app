@@ -18,6 +18,10 @@ extension ExtensionForBuildContext on BuildContext {
   /// Pops the current route
   void pop() => navigator.pop();
 
+  /// Pops until the given route
+  void popUntil(String routeName) => navigator.popUntil(ModalRoute.withName(routeName));
+  void goHome() => popUntil("/home");
+
   /// Pushes the given route
   void push(Widget route) => navigator.push(animatedPageRoute(route));
 
