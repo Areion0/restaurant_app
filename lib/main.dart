@@ -29,7 +29,10 @@ class RestaurantApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeModel.theme,
-      home: const HomePage(),
+      initialRoute: '/home',
+      routes: {
+        '/home': (context) => const HomePage(),
+      },
       debugShowCheckedModeBanner: false,
     );
   }
