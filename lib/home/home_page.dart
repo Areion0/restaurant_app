@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:restaurant_app/firebase/firestore_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/widgets/custom_appbar.dart';
@@ -47,7 +48,11 @@ class _HomePageState extends State<HomePage> {
       );
       setState(() {});
 
-      log('Products: $items');
+      Logger logger = Logger();
+
+      for (var product in products) {
+        logger.i(product.toMap().pretty);
+      }
     }
   }
 

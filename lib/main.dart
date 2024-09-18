@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/cart/cart_controller.dart';
 import 'package:restaurant_app/home/home_page.dart';
+import 'package:restaurant_app/login/login_view.dart';
 import 'package:restaurant_app/theme/theme_model.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'login/splash_view.dart';
+import 'misc/extensions.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,12 +30,15 @@ class RestaurantApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: "Restaurant App",
       theme: ThemeModel.theme,
-      initialRoute: '/home',
-      routes: {
-        '/home': (context) => const HomePage(),
-      },
+      initialRoute: "/splash",
+      onGenerateInitialRoutes: (initialRoute) => [animatedPageRoute(const SplashView())],
+      onGenerateRoute: animatedRouter({
+        "/splash": const SplashView(),
+        "/login": const LoginView(),
+        "/home": const HomePage(),
+      }),
       debugShowCheckedModeBanner: false,
     );
   }
