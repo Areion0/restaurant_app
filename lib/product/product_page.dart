@@ -11,6 +11,7 @@ import '../cart/cart_controller.dart';
 import '../cart/cart_item.dart';
 import '../models/product.dart';
 import '../theme/theme_model.dart';
+import '../widgets/loader.dart';
 
 class ProductPage extends StatefulWidget {
   final Product product;
@@ -53,7 +54,7 @@ class _ProductPageState extends State<ProductPage> {
                     children: [
                       // Image
                       widget.product.imageURL == null
-                          ? const CircularProgressIndicator()
+                          ? const Loader()
                           : ClipRRect(
                               borderRadius: BorderRadius.circular(20),
                               child: CachedNetworkImage(imageUrl: widget.product.imageURL!)),

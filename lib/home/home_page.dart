@@ -1,7 +1,9 @@
-import 'dart:developer';
+import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:restaurant_app/auth/auth_controller.dart';
 import 'package:restaurant_app/firebase/firestore_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/widgets/custom_appbar.dart';
@@ -22,9 +24,35 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  StreamSubscription<User?>? _authStateChanges;
+
   bool firstTime = true;
+  bool fetching = false;
 
   List<Product> products = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    _authStateChanges = FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      Logger logger = Logger();
+      if (user == null) {
+        logger.i("User is currently signed out!");
+
+        if (context.mounted) context.pushNamedAndRemoveAll("/login");
+      } else {
+        logger.i("User is signed in!");
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    _authStateChanges?.cancel();
+  }
 
   @override
   void didChangeDependencies() async {
@@ -33,25 +61,31 @@ class _HomePageState extends State<HomePage> {
     if (firstTime) {
       firstTime = false;
 
-      products = await FirestoreController.getProducts();
-      items = await Future.wait(
-        products.map(
-          (product) async {
-            return ImageButton(
-              imageUrl: product.imageURL ?? "",
-              onTap: () => context.push(
-                ProductPage(product: product),
-              ),
-            );
-          },
-        ),
-      );
-      setState(() {});
-
       Logger logger = Logger();
+      try {
+        setState(() => fetching = true);
+        products = await FirestoreController.getProducts();
+        items = await Future.wait(
+          products.map(
+            (product) async {
+              return ImageButton(
+                imageUrl: product.imageURL ?? "",
+                onTap: () => context.push(
+                  ProductPage(product: product),
+                ),
+              );
+            },
+          ),
+        );
+        setState(() {});
 
-      for (var product in products) {
-        logger.i(product.toMap().pretty);
+        for (var product in products) {
+          logger.i(product.toMap().pretty);
+        }
+      } on Exception catch (e) {
+        logger.e("Failed to get products: $e");
+      } finally {
+        setState(() => fetching = false);
       }
     }
   }
@@ -94,9 +128,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               InkWell(
                 borderRadius: BorderRadius.circular(50),
-                onTap: () {
-                  log('Profile Image Tapped');
-                },
+                onTap: signOut,
                 child: Container(
                   width: 40,
                   height: 40,
@@ -145,14 +177,11 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 20),
               Container(
                 height: context.mediaQuery.size.height * 0.85,
-                child:
-                    // ListView.separated(
-                    // itemCount: items.length,
-                    // itemBuilder: (context, index) =>
-                    ItemGallery(
+                child: ItemGallery(
                   title: titles[0],
                   prefix: prefixes[0],
                   items: items,
+                  fetching: fetching,
                 ),
                 // separatorBuilder: (context, index) => const SizedBox(height: 30),
                 // ),
