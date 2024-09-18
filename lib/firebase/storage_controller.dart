@@ -7,7 +7,10 @@ class StorageController {
 
     final photosRef = storage.ref().child("productImages");
 
-    return await photosRef.child("$id.jpg").getDownloadURL();
+    return await photosRef
+        .child("$id.jpg")
+        .getDownloadURL()
+        .catchError((e) => throw Exception("Failed to get file URL: $e"));
   }
 
   static Future<void> uploadFile(String id, String path) async {

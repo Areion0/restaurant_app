@@ -7,6 +7,7 @@ import 'package:slide_to_act/slide_to_act.dart';
 
 import '../theme/theme_model.dart';
 import '../widgets/custom_appbar.dart';
+import '../widgets/loader.dart';
 import '../widgets/page_blueprint.dart';
 
 class CheckoutView extends StatefulWidget {
@@ -251,7 +252,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                   sliderButtonIconPadding: 12,
                   sliderRotate: false,
                   innerColor: ThemeModel.lightGrey,
-                  submittedIcon: const CircularProgressIndicator(
+                  submittedIcon: const Loader(
                     strokeWidth: 5.5,
                   ),
                   onSubmit: () => cart.onSubmit(context),

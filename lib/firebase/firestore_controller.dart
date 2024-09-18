@@ -17,6 +17,8 @@ class FirestoreController {
       for (var doc in collection.docs) {
         list.add(doc.data());
       }
+    }).catchError((e) {
+      throw Exception("Failed to get collection: $e");
     });
 
     return list;
