@@ -21,6 +21,11 @@ class ThemeModel {
           ),
         ),
         textTheme: TextTheme(
+          headlineLarge: const TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.bold,
+            color: darkBlue,
+          ),
           titleLarge: titleLargeTextStyle,
           titleMedium: const TextStyle(
             fontSize: 20,

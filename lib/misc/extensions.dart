@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 /// Extensions for [BuildContext]
@@ -25,9 +27,18 @@ extension ExtensionForBuildContext on BuildContext {
   /// Pushes the given route
   void push(Widget route) => navigator.push(animatedPageRoute(route));
 
+  /// Pushes the route with the given name
+  void pushNamed(String routeName) => navigator.pushNamed(routeName);
+
   /// Pushes the given route and removes all the previous routes
   void pushAndRemoveAll(Widget route) => navigator.pushAndRemoveUntil(
         animatedPageRoute(route),
+        (route) => false,
+      );
+
+  /// Pushes the route with the given name and removes all the previous routes
+  void pushNamedAndRemoveAll(String routeName) => navigator.pushNamedAndRemoveUntil(
+        routeName,
         (route) => false,
       );
 }
@@ -48,3 +59,14 @@ PageRouteBuilder animatedPageRoute(Widget route) => PageRouteBuilder(
         );
       },
     );
+
+/// Wrapper to animate named routes
+RouteFactory animatedRouter(Map<String, Widget> routes) => (settings) => animatedPageRoute(routes[settings.name]!);
+
+
+/// Extensions for [Map]
+
+extension ExtensionForMap on Map {
+  /// Returns the pretty formatted JSON string of the [Map].
+  String get pretty => const JsonEncoder.withIndent('  ').convert(this);
+}
