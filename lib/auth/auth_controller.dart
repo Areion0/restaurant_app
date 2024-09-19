@@ -1,6 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:logger/logger.dart';
+
+import '../firebase/firestore_controller.dart';
 
 class AuthController with ChangeNotifier {
   UserCredential? userCredential;
@@ -14,7 +17,7 @@ class AuthController with ChangeNotifier {
   }
 
   /// Signs in the user with Google.
-  Future<UserCredential?> signInWithGoogle() async {
+  Future<UserCredential> signInWithGoogle() async {
     // Trigger the authentication flow
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
@@ -35,11 +38,26 @@ class AuthController with ChangeNotifier {
 
     try {
       userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-    } on Exception catch (e) {
-      throw Exception("Failed to sign in with credential: $e");
+    } on FirebaseAuthException catch (e) {
+      throw Exception("Failed to sign in with credential: ${e.message}");
+    } catch (e) {
+      throw Exception("An unknown error occurred during sign-in: $e");
     }
 
-    return userCredential;
+    if (userCredential?.user == null) {
+      throw Exception("User is null after sign-in");
+    }
+
+    if (userCredential?.additionalUserInfo?.isNewUser ?? false) {
+      try {
+        await FirestoreController.addNewUser(userCredential!.user!);
+        Logger().i("New user added to Firestore ${userCredential!.user!.toMap()} ");
+      } on Exception catch (e) {
+        throw Exception("Failed to add user to Firestore: $e");
+      }
+    }
+
+    return userCredential!;
   }
 
   /// Signs out the current user.
@@ -50,4 +68,13 @@ class AuthController with ChangeNotifier {
     user = null;
     userCredential = null;
   }
+}
+
+extension UserExtension on User {
+  Map<String, dynamic> toMap() => {
+        "uid": uid,
+        "email": email,
+        "displayName": displayName,
+        "photoURL": photoURL,
+      };
 }

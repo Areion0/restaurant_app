@@ -43,7 +43,7 @@ class _HomePageState extends State<HomePage> {
       if (user == null) {
         logger.i("User is currently signed out!");
 
-        context.pushNamedAndRemoveAll("/login");
+        context.goToLogin();
       } else {
         authController.user = user;
         logger.i("User is signed in!");

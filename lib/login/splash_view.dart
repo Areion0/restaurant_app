@@ -30,7 +30,7 @@ class _SplashViewState extends State<SplashView> {
       if (user == null) {
         logger.i("User is currently signed out!");
 
-        context.pushNamedAndRemoveAll("/login");
+        context.goToLogin();
       } else {
         logger.i("User is signed in!");
 
