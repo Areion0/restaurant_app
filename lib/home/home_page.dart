@@ -24,7 +24,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late AuthController authController;
   StreamSubscription<User?>? _authStateChanges;
 
   bool firstTime = true;
@@ -36,8 +35,6 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    authController = context.read<AuthController>();
-
     _authStateChanges = FirebaseAuth.instance.authStateChanges().listen((User? user) {
       Logger logger = Logger();
       if (user == null) {
@@ -45,7 +42,7 @@ class _HomePageState extends State<HomePage> {
 
         context.goToLogin();
       } else {
-        authController.user = user;
+        context.authController.user = user;
         logger.i("User is signed in!");
       }
     });
@@ -145,9 +142,10 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.circular(50),
                       ),
                       child: CircleAvatar(
-                        backgroundImage: authController.user?.photoURL == null || authController.user!.photoURL!.isEmpty
+                        backgroundImage: context.authController.user?.photoURL == null ||
+                                context.authController.user!.photoURL!.isEmpty
                             ? null
-                            : NetworkImage(authController.user!.photoURL!),
+                            : NetworkImage(context.authController.user!.photoURL!),
                       ),
                     ),
                     const SizedBox(width: 10),

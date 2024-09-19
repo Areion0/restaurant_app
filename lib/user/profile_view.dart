@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/auth/auth_controller.dart';
+import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/widgets/custom_elevated_button.dart';
 import 'package:restaurant_app/widgets/page_blueprint.dart';
 
@@ -75,7 +76,7 @@ class ProfileView extends StatelessWidget {
           // Log Out Button
           CustomElevatedButton(
             icon: const Icon(Icons.logout),
-            onPressed: context.read<AuthController>().signOut,
+            onPressed: context.authController.signOut,
             child: const Text("Log Out"),
           ),
         ],
