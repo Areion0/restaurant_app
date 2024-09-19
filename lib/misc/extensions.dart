@@ -1,6 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/cart/cart_controller.dart';
+
+import '../auth/auth_controller.dart';
 
 /// Extensions for [BuildContext]
 
@@ -42,6 +46,10 @@ extension ExtensionForBuildContext on BuildContext {
         (route) => false,
       );
   void goToLogin() => pushNamedAndRemoveAll("/login");
+
+  /// Provider shortcuts for easy access
+  AuthController get authController => read<AuthController>();
+  CartController get cartController => read<CartController>();
 }
 
 // Wrapper to animate routes

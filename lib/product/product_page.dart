@@ -1,13 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/widgets/custom_appbar.dart';
 import 'package:restaurant_app/widgets/image_button.dart';
 import 'package:restaurant_app/widgets/item_gallery.dart';
 import 'package:restaurant_app/widgets/page_blueprint.dart';
 
-import '../cart/cart_controller.dart';
 import '../cart/cart_item.dart';
 import '../models/product.dart';
 import '../theme/theme_model.dart';
@@ -78,7 +76,7 @@ class _ProductPageState extends State<ProductPage> {
                         width: context.mediaQuery.size.width * 0.6,
                         child: ElevatedButton(
                           onPressed: () {
-                            context.read<CartController>().add(CartItem(product: widget.product));
+                            context.cartController.add(CartItem(product: widget.product));
                             context.pop();
                           },
                           child: RichText(

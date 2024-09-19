@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
-import 'package:provider/provider.dart';
 import 'package:restaurant_app/auth/auth_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/theme/theme_model.dart';
@@ -47,7 +46,7 @@ class _LoginViewState extends State<LoginView> {
                 height: 65,
                 width: context.mediaQuery.size.width * 0.4,
                 onPressed: () async {
-                  AuthController authController = context.read<AuthController>();
+                  AuthController authController = context.authController;
 
                   try {
                     await authController.signInWithGoogle();
@@ -62,7 +61,7 @@ class _LoginViewState extends State<LoginView> {
                   }
 
                   String welcomeMessage = "👋 Welcome ";
-                  if(!(authController.userCredential!.additionalUserInfo?.isNewUser ?? true)) {
+                  if (!(authController.userCredential!.additionalUserInfo?.isNewUser ?? true)) {
                     welcomeMessage += "back, ";
                   }
 

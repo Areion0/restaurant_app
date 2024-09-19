@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/theme/theme_model.dart';
 import 'package:restaurant_app/widgets/rectangle_box.dart';
 
 import '../models/product.dart';
-import 'cart_controller.dart';
 
 class CartItem extends StatelessWidget {
   final Product product;
@@ -78,8 +76,8 @@ class CartItem extends StatelessWidget {
                         width: 35,
                         child: IconButton(
                           onPressed: () {
-                            context.read<CartController>().remove(this);
-                            if (context.read<CartController>().items.isEmpty) context.pop();
+                            context.cartController.remove(this);
+                            if (context.cartController.items.isEmpty) context.pop();
                           },
                           icon: const Icon(
                             Icons.remove_circle_outline,
