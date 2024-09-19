@@ -60,7 +60,7 @@ class CartController extends ChangeNotifier {
 
     Fluttertoast.showToast(msg: "✅ Order submitted!");
 
-    if (context.mounted) context.goHome();
+    if (context.mounted) context.popToHome();
 
     clear();
   }

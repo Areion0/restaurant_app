@@ -22,7 +22,7 @@ extension ExtensionForBuildContext on BuildContext {
 
   /// Pops until the given route
   void popUntil(String routeName) => navigator.popUntil((route) => route.settings.name == routeName);
-  void goHome() => popUntil("/home");
+  void popToHome() => popUntil("/home");
 
   /// Pushes the given Widget
   void push(Widget route, {String? name}) => navigator.push(animatedPageRoute(route, name: name));
@@ -41,6 +41,7 @@ extension ExtensionForBuildContext on BuildContext {
         routeName,
         (route) => false,
       );
+  void goToLogin() => pushNamedAndRemoveAll("/login");
 }
 
 // Wrapper to animate routes

@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
+import 'package:restaurant_app/auth/auth_controller.dart';
 import 'package:restaurant_app/models/product.dart';
 
 import '../models/customer_order.dart';
@@ -36,6 +38,30 @@ class FirestoreController {
     return data;
   }
 
+  static Future<void> addDocument({
+    String? docName,
+    required String collection,
+    required Map<String, dynamic> data,
+  }) async {
+    var db = FirebaseFirestore.instance;
+
+    await db.collection(collection).doc(docName).set(data).catchError((e) {
+      throw Exception("Failed to add document: $e");
+    });
+  }
+
+  static Future<void> addNewUser(User user) async {
+    try {
+      Map<String, dynamic> userData = user.toMap();
+      userData["role"] = "customer";
+
+      Logger().i("Adding user to Firestore...");
+      await addDocument(docName: user.uid, collection: "users", data: userData);
+    } on Exception catch (e) {
+      Logger().e("Failed to add user: $e");
+    }
+  }
+
   static Future<List<Product>> getProducts() async {
     var productList = await getCollection('products');
     List<Product> products = [];
@@ -46,12 +72,6 @@ class FirestoreController {
     }
 
     return products;
-  }
-
-  static Future<DocumentReference<Map<String, dynamic>>> addProduct(Map<String, dynamic> product) async {
-    var db = FirebaseFirestore.instance;
-
-    return await db.collection('products').add(product);
   }
 
   static Future<void> submitOrder(CustomerOrder customerOrder) async {

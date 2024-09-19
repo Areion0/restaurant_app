@@ -61,11 +61,14 @@ class _LoginViewState extends State<LoginView> {
                     }
                   }
 
-                  Logger().i(authController.userCredential?.user!.displayName);
-                  Logger().i(authController.userCredential?.user!.email);
-                  Logger().i(authController.userCredential?.credential?.accessToken);
+                  String welcomeMessage = "👋 Welcome ";
+                  if(!(authController.userCredential!.additionalUserInfo?.isNewUser ?? true)) {
+                    welcomeMessage += "back, ";
+                  }
 
-                  Fluttertoast.showToast(msg: "✅ Login successful!");
+                  welcomeMessage += authController.userCredential?.user!.displayName ?? "";
+
+                  Fluttertoast.showToast(msg: welcomeMessage);
 
                   if (context.mounted) context.pushNamed("/home");
                 },
