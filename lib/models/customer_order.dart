@@ -1,5 +1,7 @@
 import 'package:restaurant_app/models/product.dart';
 
+enum OrderStatus { pending, inProgress, completed, cancelled }
+
 class CustomerOrder {
   CustomerOrder({
     this.id,
@@ -13,7 +15,7 @@ class CustomerOrder {
   final String? id;
   final DateTime date;
   final double total;
-  final String status;
+  final OrderStatus status;
   final List<Product> products;
   final String customerID;
 
@@ -21,7 +23,7 @@ class CustomerOrder {
     var body = {
       'date': date.toIso8601String(),
       'total': total,
-      'status': status,
+      'status': status.name,
       'products': products.map((product) => product.toMap()).toList(),
       'customerID': customerID,
     };
