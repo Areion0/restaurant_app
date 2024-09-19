@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../theme/theme_model.dart';
+
 class Loader extends CircularProgressIndicator {
   const Loader({
     super.key,
-    super.strokeWidth = 5, // Default stroke width
+    super.strokeWidth = 5,
     super.value,
     super.backgroundColor,
-    super.color,
+    super.color = ThemeModel.lightGrey,
     super.valueColor,
   });
 }

@@ -11,7 +11,6 @@ import 'package:restaurant_app/widgets/custom_appbar.dart';
 import 'package:restaurant_app/widgets/item_gallery.dart';
 import 'package:restaurant_app/widgets/page_blueprint.dart';
 
-import '../cart/cart_view.dart';
 import '../models/product.dart';
 import '../product/product_page.dart';
 import '../theme/theme_model.dart';
@@ -85,7 +84,6 @@ class _HomePageState extends State<HomePage> {
           ),
         );
         setState(() {});
-
       } on Exception catch (e) {
         logger.e("Failed to get products: $e");
       } finally {
@@ -127,52 +125,64 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: CustomAppbar(
-          leading: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              InkWell(
-                borderRadius: BorderRadius.circular(50),
-                onTap: authController.signOut,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: ThemeModel.darkGrey,
-                      width: 3,
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 5),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(50),
+              onTap: () => context.pushNamed("/profile"),
+              child: Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: ThemeModel.darkGrey,
+                          width: 3,
+                        ),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: CircleAvatar(
+                        backgroundImage: authController.user?.photoURL == null || authController.user!.photoURL!.isEmpty
+                            ? null
+                            : NetworkImage(authController.user!.photoURL!),
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(50),
-                    color: ThemeModel.darkBlue,
-                  ),
+                    const SizedBox(width: 10),
+                    Selector<AuthController, User?>(
+                      selector: (ctx, auth) => auth.user,
+                      builder: (context, user, child) => Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user?.displayName?.split(" ")[0] ?? "",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            user?.displayName?.split(" ")[1] ?? "",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 10),
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'John',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    'Doe',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+            ),
           ),
           icon: const Icon(
             Icons.shopping_cart_outlined,
             size: 35,
           ),
-          onPressed: () => context.push(const CartView()),
+          onIconPressed: () => context.pushNamed("/cart"),
         ),
         body: PageBlueprint(
           isHome: true,

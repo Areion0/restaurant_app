@@ -7,6 +7,7 @@ import 'package:restaurant_app/widgets/page_blueprint.dart';
 
 import '../checkout/checkout_view.dart';
 import '../widgets/custom_appbar.dart';
+import '../widgets/custom_elevated_button.dart';
 
 class CartView extends StatefulWidget {
   const CartView({super.key});
@@ -33,7 +34,7 @@ class _CartViewState extends State<CartView> {
             style: ThemeModel.theme.textTheme.titleMedium,
           ),
           icon: const Icon(Icons.remove_shopping_cart_outlined, color: ThemeModel.darkRed, size: 35),
-          onPressed: () {
+          onIconPressed: () {
             cart.clear();
             if (cart.items.isEmpty) context.pop();
           },
@@ -84,7 +85,7 @@ class _CartViewState extends State<CartView> {
                     Container(
                       height: 65,
                       width: context.mediaQuery.size.width * 0.6,
-                      child: ElevatedButton(
+                      child: CustomElevatedButton(
                         onPressed: cart.items.isEmpty ? null : () => context.push(const CheckoutView()),
                         child: const Text("Checkout"),
                       ),
