@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
 import 'package:restaurant_app/auth/auth_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/theme/theme_model.dart';
@@ -51,23 +51,25 @@ class _LoginViewState extends State<LoginView> {
                   onPressed: () async {
                     setState(() => authenticating = true);
 
-                    UserCredential? user;
+                    AuthController authController = context.read<AuthController>();
 
                     try {
-                      user = await signInWithGoogle();
+                      await authController.signInWithGoogle();
                     } on Exception catch (e) {
                       Logger().e(e);
-                      if (user?.user == null) {
+                      if (authController.userCredential?.user == null) {
                         Fluttertoast.showToast(msg: "❌ Login failed, please try again.");
+                        // Logout google account 
+                        authController.signOut();
                         return;
                       }
                     } finally {
                       setState(() => authenticating = false);
                     }
 
-                    Logger().i(user?.user!.displayName);
-                    Logger().i(user?.user!.email);
-                    Logger().i(user?.credential?.accessToken);
+                    Logger().i(authController.userCredential?.user!.displayName);
+                    Logger().i(authController.userCredential?.user!.email);
+                    Logger().i(authController.userCredential?.credential?.accessToken);
 
                     Fluttertoast.showToast(msg: "✅ Login successful!");
 
