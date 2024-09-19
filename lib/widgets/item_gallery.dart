@@ -44,7 +44,7 @@ class ItemGallery extends StatelessWidget {
         Container(
           height: 120,
           child: fetching
-              ? const Center(child: Loader())
+              ? const Center(child: Loader(color: ThemeModel.darkBlue))
               : items.isEmpty
                   ? const Center(
                       child: Text(
