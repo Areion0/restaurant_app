@@ -40,11 +40,9 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
         height: widget.height,
         width: widget.width,
         child: ElevatedButton(
-          onPressed: loading
+          onPressed: loading || widget.onPressed == null
               ? null
               : () async {
-                  if (widget.onPressed == null) return;
-
                   final result = widget.onPressed!();
                   if (result is Future) {
                     setState(() => loading = true);

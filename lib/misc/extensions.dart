@@ -21,18 +21,18 @@ extension ExtensionForBuildContext on BuildContext {
   void pop() => navigator.pop();
 
   /// Pops until the given route
-  void popUntil(String routeName) => navigator.popUntil(ModalRoute.withName(routeName));
+  void popUntil(String routeName) => navigator.popUntil((route) => route.settings.name == routeName);
   void goHome() => popUntil("/home");
 
-  /// Pushes the given route
-  void push(Widget route) => navigator.push(animatedPageRoute(route));
+  /// Pushes the given Widget
+  void push(Widget route, {String? name}) => navigator.push(animatedPageRoute(route, name: name));
 
   /// Pushes the route with the given name
   void pushNamed(String routeName) => navigator.pushNamed(routeName);
 
-  /// Pushes the given route and removes all the previous routes
-  void pushAndRemoveAll(Widget route) => navigator.pushAndRemoveUntil(
-        animatedPageRoute(route),
+  /// Pushes the given Widget and removes all the previous routes
+  void pushAndRemoveAll(Widget route, {String? name}) => navigator.pushAndRemoveUntil(
+        animatedPageRoute(route, name: name),
         (route) => false,
       );
 
@@ -43,9 +43,10 @@ extension ExtensionForBuildContext on BuildContext {
       );
 }
 
-// Animated Page Route function
-PageRouteBuilder animatedPageRoute(Widget route) => PageRouteBuilder(
+// Wrapper to animate routes
+PageRouteBuilder animatedPageRoute(Widget route, {String? name}) => PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => route,
+      settings: RouteSettings(name: name),
       transitionDuration: const Duration(milliseconds: 150),
       reverseTransitionDuration: const Duration(milliseconds: 150),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -61,8 +62,8 @@ PageRouteBuilder animatedPageRoute(Widget route) => PageRouteBuilder(
     );
 
 /// Wrapper to animate named routes
-RouteFactory animatedRouter(Map<String, Widget> routes) => (settings) => animatedPageRoute(routes[settings.name]!);
-
+RouteFactory animatedRouter(Map<String, Widget> routes) =>
+    (settings) => animatedPageRoute(routes[settings.name]!, name: settings.name);
 
 /// Extensions for [Map]
 

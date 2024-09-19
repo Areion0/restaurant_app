@@ -8,6 +8,7 @@ import 'package:restaurant_app/login/login_view.dart';
 import 'package:restaurant_app/theme/theme_model.dart';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'checkout/checkout_view.dart';
 import 'firebase_options.dart';
 import 'login/splash_view.dart';
 import 'misc/extensions.dart';
@@ -37,13 +38,14 @@ class RestaurantApp extends StatelessWidget {
       title: "Restaurant App",
       theme: ThemeModel.theme,
       initialRoute: "/splash",
-      onGenerateInitialRoutes: (initialRoute) => [animatedPageRoute(const SplashView())],
+      onGenerateInitialRoutes: (initialRoute) => [animatedPageRoute(const SplashView(), name: "/splash")],
       onGenerateRoute: animatedRouter({
         "/splash": const SplashView(),
         "/login": const LoginView(),
         "/home": const HomePage(),
         "/profile": const ProfileView(),
         "/cart": const CartView(),
+        "/checkout": const CheckoutView(),
       }),
       debugShowCheckedModeBanner: false,
     );
