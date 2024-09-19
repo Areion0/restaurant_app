@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
 import 'package:restaurant_app/auth/auth_controller.dart';
 import 'package:restaurant_app/firebase/firestore_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
@@ -24,6 +25,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late AuthController authController;
   StreamSubscription<User?>? _authStateChanges;
 
   bool firstTime = true;
@@ -35,13 +37,16 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
+    authController = context.read<AuthController>();
+
     _authStateChanges = FirebaseAuth.instance.authStateChanges().listen((User? user) {
       Logger logger = Logger();
       if (user == null) {
         logger.i("User is currently signed out!");
 
-        if (context.mounted) context.pushNamedAndRemoveAll("/login");
+        context.pushNamedAndRemoveAll("/login");
       } else {
+        authController.user = user;
         logger.i("User is signed in!");
       }
     });
@@ -50,6 +55,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     super.dispose();
+
+    Logger().i("Disposing HomePage");
 
     _authStateChanges?.cancel();
   }
@@ -79,9 +86,6 @@ class _HomePageState extends State<HomePage> {
         );
         setState(() {});
 
-        for (var product in products) {
-          logger.i(product.toMap().pretty);
-        }
       } on Exception catch (e) {
         logger.e("Failed to get products: $e");
       } finally {
@@ -128,7 +132,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               InkWell(
                 borderRadius: BorderRadius.circular(50),
-                onTap: signOut,
+                onTap: authController.signOut,
                 child: Container(
                   width: 40,
                   height: 40,

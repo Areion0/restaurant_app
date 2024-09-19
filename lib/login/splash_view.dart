@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/auth/auth_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 
 import '../widgets/loader.dart';
@@ -22,6 +24,8 @@ class _SplashViewState extends State<SplashView> {
     super.initState();
 
     _authStateChanges = FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      context.read<AuthController>().user = user;
+
       Logger logger = Logger();
       if (user == null) {
         logger.i("User is currently signed out!");
