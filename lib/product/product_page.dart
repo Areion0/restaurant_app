@@ -36,7 +36,7 @@ class _ProductPageState extends State<ProductPage> {
             widget.product.name,
             style: ThemeModel.theme.textTheme.titleMedium,
           ),
-          onPressed: () {
+          onIconPressed: () {
             setState(() {
               favorite = !favorite;
             });
@@ -70,6 +70,8 @@ class _ProductPageState extends State<ProductPage> {
                         ),
                       ),
 
+                      // TODO: Replace with new button that increments/decrements the quantity in cart
+                      // Animates between ["Add to cart"] <-> [- "1" +]
                       // Add to cart
                       Container(
                         height: 65,

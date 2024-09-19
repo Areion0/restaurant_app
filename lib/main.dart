@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/auth/auth_controller.dart';
 import 'package:restaurant_app/cart/cart_controller.dart';
+import 'package:restaurant_app/cart/cart_view.dart';
 import 'package:restaurant_app/home/home_page.dart';
 import 'package:restaurant_app/login/login_view.dart';
 import 'package:restaurant_app/theme/theme_model.dart';
@@ -10,6 +11,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'login/splash_view.dart';
 import 'misc/extensions.dart';
+import 'user/profile_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +42,8 @@ class RestaurantApp extends StatelessWidget {
         "/splash": const SplashView(),
         "/login": const LoginView(),
         "/home": const HomePage(),
+        "/profile": const ProfileView(),
+        "/cart": const CartView(),
       }),
       debugShowCheckedModeBanner: false,
     );

@@ -5,8 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:restaurant_app/auth/auth_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/theme/theme_model.dart';
-import 'package:restaurant_app/widgets/loader.dart';
 import 'package:restaurant_app/widgets/page_blueprint.dart';
+
+import '../widgets/custom_elevated_button.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -16,8 +17,6 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  bool authenticating = false;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,54 +43,34 @@ class _LoginViewState extends State<LoginView> {
               ],
             ),
             Center(
-              child: Container(
+              child: CustomElevatedButton(
                 height: 65,
                 width: context.mediaQuery.size.width * 0.4,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    setState(() => authenticating = true);
+                onPressed: () async {
+                  AuthController authController = context.read<AuthController>();
 
-                    AuthController authController = context.read<AuthController>();
-
-                    try {
-                      await authController.signInWithGoogle();
-                    } on Exception catch (e) {
-                      Logger().e(e);
-                      if (authController.userCredential?.user == null) {
-                        Fluttertoast.showToast(msg: "❌ Login failed, please try again.");
-                        // Logout google account 
-                        authController.signOut();
-                        return;
-                      }
-                    } finally {
-                      setState(() => authenticating = false);
+                  try {
+                    await authController.signInWithGoogle();
+                  } on Exception catch (e) {
+                    Logger().e(e);
+                    if (authController.userCredential?.user == null) {
+                      Fluttertoast.showToast(msg: "❌ Login failed, please try again.");
+                      // Logout google account
+                      authController.signOut();
+                      return;
                     }
+                  }
 
-                    Logger().i(authController.userCredential?.user!.displayName);
-                    Logger().i(authController.userCredential?.user!.email);
-                    Logger().i(authController.userCredential?.credential?.accessToken);
+                  Logger().i(authController.userCredential?.user!.displayName);
+                  Logger().i(authController.userCredential?.user!.email);
+                  Logger().i(authController.userCredential?.credential?.accessToken);
 
-                    Fluttertoast.showToast(msg: "✅ Login successful!");
+                  Fluttertoast.showToast(msg: "✅ Login successful!");
 
-                    if (context.mounted) context.pushNamed("/home");
-                  },
-                  child: authenticating
-                      ? const Center(
-                          child: Loader(
-                          color: ThemeModel.lightGrey,
-                        ))
-                      : const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text(
-                              "Login",
-                            ),
-                            Icon(
-                              Icons.login,
-                            ),
-                          ],
-                        ),
-                ),
+                  if (context.mounted) context.pushNamed("/home");
+                },
+                icon: const Icon(Icons.login),
+                child: const Text("Login"),
               ),
             ),
             const SizedBox(height: 20),
