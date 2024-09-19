@@ -53,8 +53,8 @@ class CartController extends ChangeNotifier {
         date: DateTime.now(),
         products: products,
         total: products.fold(0.0, (sum, product) => sum + product.price),
-        customerID: "2",
-        status: "Test",
+        customerID: context.authController.user!.uid,
+        status: OrderStatus.pending,
       ),
     );
 
