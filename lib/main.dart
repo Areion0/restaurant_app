@@ -12,6 +12,7 @@ import 'checkout/checkout_view.dart';
 import 'firebase_options.dart';
 import 'login/splash_view.dart';
 import 'misc/extensions.dart';
+import 'user/my_orders_view.dart';
 import 'user/profile_view.dart';
 
 void main() async {
@@ -44,6 +45,7 @@ class RestaurantApp extends StatelessWidget {
         "/login": const LoginView(),
         "/home": const HomePage(),
         "/profile": const ProfileView(),
+        "/my_orders": const MyOrdersView(),
         "/cart": const CartView(),
         "/checkout": const CheckoutView(),
       }),

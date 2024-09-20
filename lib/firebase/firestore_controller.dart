@@ -26,6 +26,63 @@ class FirestoreController {
     return list;
   }
 
+  /// Converts a Firestore document snapshot to a Dart object
+  static T fromFirestore<T>(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+    T Function(Map<String, dynamic> data) fromJson,
+  ) {
+    if (snapshot.exists) {
+      return fromJson(snapshot.data()!);
+    } else {
+      throw Exception("Document does not exist");
+    }
+  }
+
+  static Map<String, dynamic> toFirestore<T>(
+    T value,
+    Map<String, dynamic> Function(T value) toJson,
+  ) =>
+      toJson(value);
+
+  static Future<List<T>> getCollectionPaginated<T>(
+    String collection, {
+    int pageSize = 15,
+    String orderBy = "date",
+    bool descending = true,
+    DocumentSnapshot? startAfter,
+    Function(DocumentSnapshot?)? onLastDocumentInPage,
+
+    /// The function to convert the Firestore document snapshot to a Dart object
+    required T Function(Map<String, dynamic> data) fromJson,
+
+    /// The function to convert the Dart object to a Firestore document snapshot
+    required Map<String, dynamic> Function(T value) toJson,
+  }) async {
+    var db = FirebaseFirestore.instance;
+
+    List<T> list = [];
+
+    Query<T> query = db.collection(collection).orderBy(orderBy, descending: descending).limit(pageSize).withConverter(
+          fromFirestore: (snapshot, options) => fromFirestore(snapshot, fromJson),
+          toFirestore: (value, options) => toFirestore(value, toJson),
+        );
+
+    if (startAfter != null) {
+      query = query.startAfterDocument(startAfter);
+    }
+
+    try {
+      var collectionSnapshot = await query.get();
+      onLastDocumentInPage?.call(collectionSnapshot.docs.isNotEmpty ? collectionSnapshot.docs.last : null);
+      for (var doc in collectionSnapshot.docs) {
+        list.add(doc.data());
+      }
+      return list;
+    } catch (e) {
+      throw Exception("Failed to get collection: $e");
+    }
+  }
+
   static Future<Map<String, dynamic>> getDocument(String collection, String id) async {
     var db = FirebaseFirestore.instance;
 
