@@ -1,0 +1,45 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/models/customer_order.dart';
+import 'package:restaurant_app/widgets/custom_appbar.dart';
+import 'package:restaurant_app/widgets/infinite_list/infinite_list.dart';
+import 'package:restaurant_app/widgets/infinite_list/infinite_list_controller.dart';
+import 'package:restaurant_app/widgets/page_blueprint.dart';
+
+import '../theme/theme_model.dart';
+
+class MyOrdersView extends StatefulWidget {
+  const MyOrdersView({super.key});
+
+  @override
+  State<MyOrdersView> createState() => _MyOrdersViewState();
+}
+
+class _MyOrdersViewState extends State<MyOrdersView> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: CustomAppbar(
+        title: Text(
+          "My Orders",
+          style: ThemeModel.theme.textTheme.titleMedium,
+        ),
+      ),
+      body: PageBlueprint(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: ChangeNotifierProvider(
+            create: (context) => InfiniteListController<CustomerOrder>(),
+            child: InfiniteList<CustomerOrder>(
+              collection: "orders",
+              loadingText: "Loading orders...",
+              itemBuilder: (item, index) => Text("Order ${item.status}"),
+              fromJson: (item) => CustomerOrder.fromMap(item),
+              toJson: (object) => object.toMap(),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

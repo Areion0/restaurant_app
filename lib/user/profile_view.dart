@@ -69,7 +69,7 @@ class ProfileView extends StatelessWidget {
           // My orders Button
           CustomElevatedButton(
             icon: const Icon(Icons.shopping_cart_outlined),
-            onPressed: () async {},
+            onPressed: () => context.pushNamed("/my_orders"),
             child: const Text("My Orders"),
           ),
 

@@ -12,6 +12,15 @@ class CustomerOrder {
     required this.customerID,
   });
 
+  factory CustomerOrder.fromMap(Map<String, dynamic> json) => CustomerOrder(
+      id: json['id'],
+      date: DateTime.parse(json['date']),
+      total: json['total'],
+      status: OrderStatus.values.firstWhere((status) => status.name == json['status']),
+      products: (json['products'] as List).map((product) => Product.fromMap(product)).toList(),
+      customerID: json['customerID'],
+    );
+
   final String? id;
   final DateTime date;
   final double total;
