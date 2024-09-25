@@ -11,16 +11,24 @@ class OrderPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      borderRadius: BorderRadius.circular(20),
       onTap: () => Logger().i("Order ${order.id} tapped"),
       child: Card(
+        // color: ThemeModel.darkBlue,
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text("${order.date}"),
-              Text(order.status.name.capitalize, style: ThemeModel.theme.textTheme.bodyLarge,),
-              Text("Total: ${order.total}"),
+              Text(
+                order.status.name.capitalize,
+                style: ThemeModel.theme.textTheme.titleMedium,
+              ),
+              Text(
+                order.total.price,
+                style: ThemeModel.theme.textTheme.bodyLarge,
+              ),
             ],
           ),
         ),

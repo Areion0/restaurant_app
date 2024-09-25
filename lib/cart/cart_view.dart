@@ -85,7 +85,11 @@ class _CartViewState extends State<CartView> {
                       height: 65,
                       width: context.mediaQuery.size.width * 0.6,
                       child: CustomElevatedButton(
-                        onPressed: cart.items.isEmpty ? null : () => context.pushNamed("/checkout"),
+                        onPressed: cart.items.isEmpty
+                            ? null
+                            : () {
+                                context.pushNamed("/checkout");
+                              },
                         child: const Text("Checkout"),
                       ),
                     ),

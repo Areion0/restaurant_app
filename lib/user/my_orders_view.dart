@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:restaurant_app/auth/auth_controller.dart';
 import 'package:restaurant_app/models/customer_order.dart';
 import 'package:restaurant_app/widgets/custom_appbar.dart';
 import 'package:restaurant_app/widgets/infinite_list/infinite_list.dart';
@@ -31,6 +32,9 @@ class _MyOrdersViewState extends State<MyOrdersView> {
           create: (context) => InfiniteListController<CustomerOrder>(),
           child: InfiniteList<CustomerOrder>(
             collection: "orders",
+            filters: {
+              "customerID": context.read<AuthController>().user!.uid,
+            },
             loadingText: "Loading orders...",
             itemBuilder: (item, index) => OrderPanel(order: item),
             fromJson: (item, id) => CustomerOrder.fromMap(item, id: id),
