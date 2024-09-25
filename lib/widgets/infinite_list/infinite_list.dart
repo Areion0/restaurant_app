@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/theme/theme_model.dart';
@@ -17,6 +15,7 @@ class InfiniteList<T> extends StatefulWidget {
 
   /// Function to convert a map to an object of type T
   final T Function(Map<String, dynamic> item) fromJson;
+
   /// Function to convert an object of type T to a map
   final Map<String, dynamic> Function(T object) toJson;
 
@@ -35,11 +34,11 @@ class InfiniteList<T> extends StatefulWidget {
   });
 
   @override
-  State<InfiniteList> createState() => _InfiniteListState();
+  State<InfiniteList<T>> createState() => _InfiniteListState<T>();
 }
 
 class _InfiniteListState<T> extends State<InfiniteList<T>> {
-   InfiniteListController<T> controller = InfiniteListController<T>();
+  late InfiniteListController<T> controller;
 
   bool firstTime = true;
 
@@ -47,7 +46,7 @@ class _InfiniteListState<T> extends State<InfiniteList<T>> {
   void initState() {
     super.initState();
 
-    // controller = context.read<InfiniteListController<T>>();
+    controller = context.read<InfiniteListController<T>>();
 
     controller.init(
       collection: widget.collection,
@@ -62,7 +61,7 @@ class _InfiniteListState<T> extends State<InfiniteList<T>> {
     Future.microtask(() {
       if (firstTime) {
         firstTime = false;
-        // controller.fetchData();
+        controller.fetchData();
       }
     });
   }
