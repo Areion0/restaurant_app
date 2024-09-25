@@ -1,6 +1,6 @@
 import 'package:restaurant_app/models/product.dart';
 
-enum OrderStatus { pending, inProgress, completed, cancelled }
+enum OrderStatus { pending, inProgress, completed, cancelled, unknown }
 
 class CustomerOrder {
   CustomerOrder({
@@ -13,13 +13,16 @@ class CustomerOrder {
   });
 
   factory CustomerOrder.fromMap(Map<String, dynamic> json) => CustomerOrder(
-      id: json['id'],
-      date: DateTime.parse(json['date']),
-      total: json['total'],
-      status: OrderStatus.values.firstWhere((status) => status.name == json['status']),
-      products: (json['products'] as List).map((product) => Product.fromMap(product)).toList(),
-      customerID: json['customerID'],
-    );
+        id: json['id'] ?? "",
+        date: DateTime.parse(json['date'] ?? ""),
+        total: json['total'] ?? 0.0,
+        status: OrderStatus.values.firstWhere(
+          (status) => status.name == json['status'],
+          orElse: () => OrderStatus.unknown,
+        ),
+        products: ((json['products'] ?? "") as List).map((product) => Product.fromMap(product)).toList(),
+        customerID: json['customerID'] ?? "",
+      );
 
   final String? id;
   final DateTime date;
