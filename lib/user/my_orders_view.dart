@@ -4,6 +4,7 @@ import 'package:restaurant_app/models/customer_order.dart';
 import 'package:restaurant_app/widgets/custom_appbar.dart';
 import 'package:restaurant_app/widgets/infinite_list/infinite_list.dart';
 import 'package:restaurant_app/widgets/infinite_list/infinite_list_controller.dart';
+import 'package:restaurant_app/widgets/orders/order_panel.dart';
 import 'package:restaurant_app/widgets/page_blueprint.dart';
 
 import '../theme/theme_model.dart';
@@ -26,17 +27,14 @@ class _MyOrdersViewState extends State<MyOrdersView> {
         ),
       ),
       body: PageBlueprint(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: ChangeNotifierProvider(
-            create: (context) => InfiniteListController<CustomerOrder>(),
-            child: InfiniteList<CustomerOrder>(
-              collection: "orders",
-              loadingText: "Loading orders...",
-              itemBuilder: (item, index) => Text("Order ${item.status}"),
-              fromJson: (item) => CustomerOrder.fromMap(item),
-              toJson: (object) => object.toMap(),
-            ),
+        child: ChangeNotifierProvider(
+          create: (context) => InfiniteListController<CustomerOrder>(),
+          child: InfiniteList<CustomerOrder>(
+            collection: "orders",
+            loadingText: "Loading orders...",
+            itemBuilder: (item, index) => OrderPanel(order: item),
+            fromJson: (item, id) => CustomerOrder.fromMap(item, id: id),
+            toJson: (object) => object.toMap(),
           ),
         ),
       ),

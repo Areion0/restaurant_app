@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 
+import '../theme/theme_model.dart';
 import '../widgets/loader.dart';
 
 class SplashView extends StatefulWidget {
@@ -48,7 +49,7 @@ class _SplashViewState extends State<SplashView> {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(
-        child: Loader(),
+        child: Loader(color: ThemeModel.darkBlue),
       ),
     );
   }

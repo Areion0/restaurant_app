@@ -14,7 +14,7 @@ class InfiniteList<T> extends StatefulWidget {
   final String? loadingText;
 
   /// Function to convert a map to an object of type T
-  final T Function(Map<String, dynamic> item) fromJson;
+  final T Function(Map<String, dynamic> item, String id) fromJson;
 
   /// Function to convert an object of type T to a map
   final Map<String, dynamic> Function(T object) toJson;
