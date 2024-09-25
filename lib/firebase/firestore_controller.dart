@@ -47,6 +47,7 @@ class FirestoreController {
   static Future<List<T>> getCollectionPaginated<T>(
     String collection, {
     int pageSize = 15,
+    Map<String, dynamic> filters = const {},
     String orderBy = "date",
     bool descending = true,
     DocumentSnapshot? startAfter,
@@ -67,20 +68,22 @@ class FirestoreController {
           toFirestore: (value, options) => toFirestore(value, toJson),
         );
 
+    if (filters.isNotEmpty) {
+      filters.forEach((key, value) {
+        query = query.where(key, isEqualTo: value);
+      });
+    }
+
     if (startAfter != null) {
       query = query.startAfterDocument(startAfter);
     }
 
-    try {
-      var collectionSnapshot = await query.get();
-      onLastDocumentInPage?.call(collectionSnapshot.docs.isNotEmpty ? collectionSnapshot.docs.last : null);
-      for (var doc in collectionSnapshot.docs) {
-        list.add(doc.data());
-      }
-      return list;
-    } catch (e) {
-      throw Exception("Failed to get collection: $e");
+    var collectionSnapshot = await query.get();
+    onLastDocumentInPage?.call(collectionSnapshot.docs.isNotEmpty ? collectionSnapshot.docs.last : null);
+    for (var doc in collectionSnapshot.docs) {
+      list.add(doc.data());
     }
+    return list;
   }
 
   static Future<Map<String, dynamic>> getDocument(String collection, String id) async {

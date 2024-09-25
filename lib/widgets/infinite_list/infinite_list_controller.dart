@@ -1,18 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 
 import '../../firebase/firestore_controller.dart';
 
 class InfiniteListController<T> extends ChangeNotifier {
-  //  ChangeNotifierProvider<InfiniteListController<T>> provide(InfiniteList<T> infiniteList) => ChangeNotifierProvider(
-  //       create: (_) => InfiniteListController<T>(),
-  //       child: infiniteList,
-  //     );
-
   void init({
     required String collection,
     required int pageSize,
     required String orderBy,
+    Map<String, dynamic>? filters,
     required bool descending,
     required T Function(Map<String, dynamic>, String id) fromJson,
     required Map<String, dynamic> Function(T object) toJson,
@@ -20,6 +17,7 @@ class InfiniteListController<T> extends ChangeNotifier {
     this.collection = collection;
     this.pageSize = pageSize;
     this.orderBy = orderBy;
+    this.filters = filters;
     this.descending = descending;
     this.fromJson = fromJson;
     this.toJson = toJson;
@@ -28,11 +26,12 @@ class InfiniteListController<T> extends ChangeNotifier {
   late final String collection;
   late final int pageSize;
   late final String orderBy;
+  late final Map<String, dynamic>? filters;
   late final bool descending;
   late final T Function(Map<String, dynamic>, String id) fromJson;
   late final Map<String, dynamic> Function(T object) toJson;
 
-  bool _fetching = false;
+  bool _fetching = true;
   bool get fetching => _fetching;
   set fetching(bool value) {
     _fetching = value;
@@ -48,6 +47,7 @@ class InfiniteListController<T> extends ChangeNotifier {
 
   void addPage(List<T> page) {
     _data.addAll(page);
+    Logger().i("Data length: ${_data.length}");
     notifyListeners();
   }
 
@@ -66,12 +66,11 @@ class InfiniteListController<T> extends ChangeNotifier {
   DocumentSnapshot? lastDocument;
 
   Future<void> fetchData() async {
-    fetching = true;
-
     try {
       var page = await FirestoreController.getCollectionPaginated<T>(
         collection,
         pageSize: pageSize,
+        filters: filters ?? {},
         orderBy: orderBy,
         descending: descending,
         startAfter: lastDocument,
@@ -85,7 +84,8 @@ class InfiniteListController<T> extends ChangeNotifier {
       }
 
       addPage(page);
-    } catch (e) {
+    } catch (e, s) {
+      Logger().e(s);
       throw Exception("Failed to fetch data: $e");
     } finally {
       fetching = false;

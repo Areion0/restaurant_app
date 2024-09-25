@@ -9,6 +9,7 @@ class InfiniteList<T> extends StatefulWidget {
   final String collection;
   final int pageSize;
   final String orderBy;
+  final Map<String, dynamic>? filters;
   final bool descending;
 
   final String? loadingText;
@@ -26,6 +27,7 @@ class InfiniteList<T> extends StatefulWidget {
     required this.collection,
     this.pageSize = 15,
     this.orderBy = "date",
+    this.filters,
     this.descending = true,
     this.loadingText,
     required this.fromJson,
@@ -52,6 +54,7 @@ class _InfiniteListState<T> extends State<InfiniteList<T>> {
       collection: widget.collection,
       pageSize: widget.pageSize,
       orderBy: widget.orderBy,
+      filters: widget.filters,
       descending: widget.descending,
       fromJson: widget.fromJson,
       toJson: widget.toJson,
@@ -75,15 +78,41 @@ class _InfiniteListState<T> extends State<InfiniteList<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return controller.fetching
-        ? Center(
-            child: Loader(
-              color: ThemeModel.darkBlue,
-            ),
-          )
-        : ListView.builder(
-            itemCount: controller.data.length,
-            itemBuilder: (ctx, index) => widget.itemBuilder(controller.data[index], index),
-          );
+    return CustomScrollView(
+      slivers: [
+        controller.fetching
+            ? SliverToBoxAdapter(
+                child: const Center(
+                  child: Loader(
+                    color: ThemeModel.darkBlue,
+                  ),
+                ),
+              )
+            : SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (ctx, index) {
+                    if (index == controller.data.length) {
+                      if (controller.endOfData) {
+                        return null;
+                      }
+                      controller.fetchData();
+                      return const Center(
+                        child: Loader(
+                          color: ThemeModel.darkBlue,
+                        ),
+                      );
+                    }
+
+                    return widget.itemBuilder(controller.data[index], index);
+                  },
+                  childCount: controller.data.length + 1,
+                ),
+              ),
+      ],
+    );
+    // ListView.builder(
+    // itemCount: controller.data.length,
+    // itemBuilder: (ctx, index) => widget.itemBuilder(controller.data[index], index),
+    // );
   }
 }

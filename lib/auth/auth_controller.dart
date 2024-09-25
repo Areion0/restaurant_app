@@ -32,15 +32,18 @@ class AuthController with ChangeNotifier {
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
-    } catch (e) {
+    } catch (e, s) {
+      Logger().e(s);
       throw Exception("Failed to create credential: $e");
     }
 
     try {
       userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-    } on FirebaseAuthException catch (e) {
+    } on FirebaseAuthException catch (e, s) {
+      Logger().e(s);
       throw Exception("Failed to sign in with credential: ${e.message}");
-    } catch (e) {
+    } catch (e, s) {
+      Logger().e(s);
       throw Exception("An unknown error occurred during sign-in: $e");
     }
 
@@ -52,7 +55,8 @@ class AuthController with ChangeNotifier {
       try {
         await FirestoreController.addNewUser(userCredential!.user!);
         Logger().i("New user added to Firestore ${userCredential!.user!.toMap()} ");
-      } on Exception catch (e) {
+      } on Exception catch (e, s) {
+        Logger().e(s);
         throw Exception("Failed to add user to Firestore: $e");
       }
     }
