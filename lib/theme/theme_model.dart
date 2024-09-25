@@ -81,6 +81,8 @@ extension TextStyleExtension on TextStyle {
 
 extension StringFormattingExtension on String {
   String get price => '€ $this';
+
+  String get capitalize => "${this[0].toUpperCase()}${substring(1)}";
 }
 
 extension DoubleFormattingExtension on double {

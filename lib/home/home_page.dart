@@ -155,14 +155,14 @@ class _HomePageState extends State<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            user?.displayName?.split(" ")[0] ?? "",
+                            user?.displayName?.split(" ").first ?? "",
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            user?.displayName?.split(" ")[1] ?? "",
+                            user?.displayName?.split(" ").last ?? "",
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,

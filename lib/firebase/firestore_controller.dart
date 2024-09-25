@@ -29,10 +29,10 @@ class FirestoreController {
   /// Converts a Firestore document snapshot to a Dart object
   static T fromFirestore<T>(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
-    T Function(Map<String, dynamic> data) fromJson,
+    T Function(Map<String, dynamic> data, String id) fromJson,
   ) {
     if (snapshot.exists) {
-      return fromJson(snapshot.data()!);
+      return fromJson(snapshot.data()!, snapshot.id);
     } else {
       throw Exception("Document does not exist");
     }
@@ -53,7 +53,7 @@ class FirestoreController {
     Function(DocumentSnapshot?)? onLastDocumentInPage,
 
     /// The function to convert the Firestore document snapshot to a Dart object
-    required T Function(Map<String, dynamic> data) fromJson,
+    required T Function(Map<String, dynamic> data, String id) fromJson,
 
     /// The function to convert the Dart object to a Firestore document snapshot
     required Map<String, dynamic> Function(T value) toJson,

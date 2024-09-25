@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:restaurant_app/widgets/infinite_list/infinite_list.dart';
 
 import '../../firebase/firestore_controller.dart';
 
@@ -16,7 +14,7 @@ class InfiniteListController<T> extends ChangeNotifier {
     required int pageSize,
     required String orderBy,
     required bool descending,
-    required T Function(Map<String, dynamic>) fromJson,
+    required T Function(Map<String, dynamic>, String id) fromJson,
     required Map<String, dynamic> Function(T object) toJson,
   }) {
     this.collection = collection;
@@ -31,7 +29,7 @@ class InfiniteListController<T> extends ChangeNotifier {
   late final int pageSize;
   late final String orderBy;
   late final bool descending;
-  late final T Function(Map<String, dynamic>) fromJson;
+  late final T Function(Map<String, dynamic>, String id) fromJson;
   late final Map<String, dynamic> Function(T object) toJson;
 
   bool _fetching = false;
