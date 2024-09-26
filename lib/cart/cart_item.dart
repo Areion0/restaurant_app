@@ -14,8 +14,8 @@ class CartItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double width = context.mediaQuery.size.width * 0.75;
-    double height = context.mediaQuery.size.height * 0.13;
+    double width = context.screenSize.width * 0.75;
+    double height = context.screenSize.height * 0.13;
 
     return Center(
       child: RectangleBox(

@@ -13,7 +13,7 @@ class RectangleBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        height: height ?? context.mediaQuery.size.height * 0.13,
+        height: height ?? context.screenSize.height * 0.13,
         width: width,
         padding: padding,
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: ThemeModel.lightGrey),

@@ -39,7 +39,7 @@ class _CheckoutViewState extends State<CheckoutView> {
           padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
           child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Container(
-              height: context.mediaQuery.size.height * 0.3,
+              height: context.screenSize.height * 0.3,
               decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: ThemeModel.darkGrey),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -150,14 +150,14 @@ class _CheckoutViewState extends State<CheckoutView> {
               ),
             ),
             Container(
-              height: context.mediaQuery.size.height * 0.4,
+              height: context.screenSize.height * 0.4,
               decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: ThemeModel.darkGrey),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   children: [
                     Container(
-                      height: (context.mediaQuery.size.height * 0.4) * 0.65,
+                      height: (context.screenSize.height * 0.4) * 0.65,
                       child: ListView.separated(
                           itemBuilder: (context, index) => Padding(
                                 padding: EdgeInsets.only(
@@ -247,7 +247,7 @@ class _CheckoutViewState extends State<CheckoutView> {
             // Submit Button
             Container(
                 height: 65,
-                width: context.mediaQuery.size.width * 0.6,
+                width: context.screenSize.width * 0.6,
                 child: SlideAction(
                   sliderButtonIconPadding: 12,
                   sliderRotate: false,

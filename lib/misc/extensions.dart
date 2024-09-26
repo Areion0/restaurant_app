@@ -12,11 +12,11 @@ extension ExtensionForBuildContext on BuildContext {
   /// Returns the [ThemeData] of the current [BuildContext].
   ThemeData get theme => Theme.of(this);
 
-  /// Returns the [MediaQueryData] of the current [BuildContext].
-  MediaQueryData get mediaQuery => MediaQuery.of(this);
+  /// Returns the [Size] of the current Screen.
+  Size get screenSize => MediaQuery.sizeOf(this);
 
-  double get height => mediaQuery.size.height;
-  double get width => mediaQuery.size.width;
+  double get height => screenSize.height;
+  double get width => screenSize.width;
 
   /// Returns the [NavigatorState] of the current [BuildContext].
   NavigatorState get navigator => Navigator.of(this);

@@ -73,7 +73,7 @@ class _ProductPageState extends State<ProductPage> {
                       // Add to cart
                       Container(
                         height: 65,
-                        width: context.mediaQuery.size.width * 0.6,
+                        width: context.screenSize.width * 0.6,
                         child: ElevatedButton(
                           onPressed: () {
                             context.cartController.add(CartItem(product: widget.product));
