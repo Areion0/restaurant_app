@@ -46,7 +46,7 @@ class _CartViewState extends State<CartView> {
                 Column(
                   children: [
                     Container(
-                      height: context.mediaQuery.size.height * 0.7,
+                      height: context.screenSize.height * 0.7,
                       decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: ThemeModel.darkGrey),
                       child: cart.items.isEmpty
                           ? const Center(
@@ -80,10 +80,10 @@ class _CartViewState extends State<CartView> {
                                   ),
                               itemCount: cart.items.length),
                     ),
-                    SizedBox(height: context.mediaQuery.size.height * 0.04),
+                    SizedBox(height: context.screenSize.height * 0.04),
                     Container(
                       height: 65,
-                      width: context.mediaQuery.size.width * 0.6,
+                      width: context.screenSize.width * 0.6,
                       child: CustomElevatedButton(
                         onPressed: cart.items.isEmpty
                             ? null

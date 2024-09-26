@@ -188,7 +188,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               const SizedBox(height: 20),
               Container(
-                height: context.mediaQuery.size.height * 0.85,
+                height: context.screenSize.height * 0.85,
                 child: ItemGallery(
                   title: titles[0],
                   prefix: prefixes[0],

@@ -44,7 +44,7 @@ class _LoginViewState extends State<LoginView> {
             Center(
               child: CustomElevatedButton(
                 height: 65,
-                width: context.mediaQuery.size.width * 0.4,
+                width: context.screenSize.width * 0.4,
                 onPressed: () async {
                   AuthController authController = context.authController;
 
