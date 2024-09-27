@@ -6,9 +6,7 @@ import 'package:restaurant_app/cart/cart_controller.dart';
 
 import '../auth/auth_controller.dart';
 
-/// Extensions for [BuildContext]
-
-extension ExtensionForBuildContext on BuildContext {
+extension BuildContextExtensions on BuildContext {
   /// Returns the [ThemeData] of the current [BuildContext].
   ThemeData get theme => Theme.of(this);
 
@@ -74,9 +72,18 @@ PageRouteBuilder animatedPageRoute(Widget route, {String? name}) => PageRouteBui
 RouteFactory animatedRouter(Map<String, Widget> routes) =>
     (settings) => animatedPageRoute(routes[settings.name]!, name: settings.name);
 
-/// Extensions for [Map]
-
-extension ExtensionForMap on Map {
+extension MapExtensions on Map {
   /// Returns the pretty formatted JSON string of the [Map].
   String get pretty => const JsonEncoder.withIndent('  ').convert(this);
+}
+
+extension DateTimeExtensions on DateTime {
+  /// Returns the formatted date string.
+  String get formattedDate => "${day.toString().padLeft(2, '0')}/${month.toString().padLeft(2, '0')}/$year";
+
+  /// Returns the formatted time string.
+  String get formattedTime => "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}";
+
+  /// Returns the formatted date and time string.
+  String get formattedDateTime => "$formattedDate $formattedTime";
 }

@@ -53,6 +53,8 @@ class InfiniteListController<T> extends ChangeNotifier {
 
   void clear() {
     _data.clear();
+    lastDocument = null;
+    endOfData = false;
     notifyListeners();
   }
 
@@ -79,16 +81,24 @@ class InfiniteListController<T> extends ChangeNotifier {
         toJson: toJson,
       );
 
+      Logger().i("End of data");
       if (page.length < pageSize) {
         endOfData = true;
       }
 
       addPage(page);
     } catch (e, s) {
+      Logger().e(e);
       Logger().e(s);
-      throw Exception("Failed to fetch data: $e");
+      endOfData = true;
     } finally {
       fetching = false;
     }
+  }
+
+  Future<void> refresh() async {
+    clear();
+    fetching = true;
+    await fetchData();
   }
 }

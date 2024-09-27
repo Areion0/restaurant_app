@@ -38,6 +38,7 @@ class FirestoreController {
     }
   }
 
+  /// Converts a Dart object to a Firestore document snapshot
   static Map<String, dynamic> toFirestore<T>(
     T value,
     Map<String, dynamic> Function(T value) toJson,
@@ -140,7 +141,8 @@ class FirestoreController {
     try {
       var db = FirebaseFirestore.instance;
 
-      Future<void> firestoreOperation = db.collection('orders').add(order);
+      Future<void> firestoreOperation =
+          db.collection("users").doc(FirebaseAuth.instance.currentUser!.uid).collection("orders").add(order);
 
       await firestoreOperation.timeout(
         const Duration(seconds: 5),
@@ -153,5 +155,13 @@ class FirestoreController {
     } catch (e) {
       Logger().i('Error submitting order: $e');
     }
+  }
+
+  static Future<void> deleteDocument(String collection, String id) async {
+    var db = FirebaseFirestore.instance;
+
+    await db.collection(collection).doc(id).delete().catchError((e) {
+      throw Exception("Failed to delete document: $e");
+    });
   }
 }

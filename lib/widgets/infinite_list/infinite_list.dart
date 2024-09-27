@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/theme/theme_model.dart';
 import 'package:restaurant_app/widgets/loader.dart';
@@ -12,6 +13,7 @@ class InfiniteList<T> extends StatefulWidget {
   final Map<String, dynamic>? filters;
   final bool descending;
 
+  final String noItemsText;
   final String? loadingText;
 
   /// Function to convert a map to an object of type T
@@ -29,6 +31,7 @@ class InfiniteList<T> extends StatefulWidget {
     this.orderBy = "date",
     this.filters,
     this.descending = true,
+    this.noItemsText = "No items found",
     this.loadingText,
     required this.fromJson,
     required this.toJson,
@@ -60,13 +63,12 @@ class _InfiniteListState<T> extends State<InfiniteList<T>> {
       toJson: widget.toJson,
     );
 
-    // Defer state modification to avoid build phase issues
-    Future.microtask(() {
-      if (firstTime) {
-        firstTime = false;
+    if (firstTime) {
+      firstTime = false;
+      Future.microtask(() {
         controller.fetchData();
-      }
-    });
+      });
+    }
   }
 
   @override
@@ -78,41 +80,56 @@ class _InfiniteListState<T> extends State<InfiniteList<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        controller.fetching
-            ? SliverToBoxAdapter(
-                child: const Center(
-                  child: Loader(
-                    color: ThemeModel.darkBlue,
-                  ),
+    return controller.fetching
+        ? const Center(
+            child: Loader(
+              color: ThemeModel.darkBlue,
+            ),
+          )
+        : controller.data.isEmpty
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.info,
+                      size: 40,
+                      color: ThemeModel.darkGrey,
+                    ),
+                    const Gap(10),
+                    Text(
+                      widget.noItemsText,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ],
                 ),
               )
-            : SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (ctx, index) {
-                    if (index == controller.data.length) {
-                      if (controller.endOfData) {
-                        return null;
-                      }
-                      controller.fetchData();
-                      return const Center(
-                        child: Loader(
-                          color: ThemeModel.darkBlue,
-                        ),
-                      );
-                    }
+            : RefreshIndicator(
+                onRefresh: () => controller.refresh(),
+                child: CustomScrollView(
+                  slivers: [
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (ctx, index) {
+                          if (index == controller.data.length) {
+                            if (controller.endOfData) {
+                              return null;
+                            }
+                            controller.fetchData();
+                            return const Center(
+                              child: Loader(
+                                color: ThemeModel.darkBlue,
+                              ),
+                            );
+                          }
 
-                    return widget.itemBuilder(controller.data[index], index);
-                  },
-                  childCount: controller.data.length + 1,
+                          return widget.itemBuilder(controller.data[index], index);
+                        },
+                        childCount: controller.data.length + 1,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-      ],
-    );
-    // ListView.builder(
-    // itemCount: controller.data.length,
-    // itemBuilder: (ctx, index) => widget.itemBuilder(controller.data[index], index),
-    // );
+              );
   }
 }
