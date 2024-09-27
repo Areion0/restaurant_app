@@ -31,10 +31,8 @@ class _MyOrdersViewState extends State<MyOrdersView> {
         child: ChangeNotifierProvider(
           create: (context) => InfiniteListController<CustomerOrder>(),
           child: InfiniteList<CustomerOrder>(
-            collection: "orders",
-            filters: {
-              "customerID": context.authController.user!.uid,
-            },
+            collection: "users/${context.authController.user!.uid}/orders",
+            noItemsText: "No orders found",
             loadingText: "Loading orders...",
             itemBuilder: (item, index) => OrderPanel(order: item),
             fromJson: (item, id) => CustomerOrder.fromMap(item, id: id),
