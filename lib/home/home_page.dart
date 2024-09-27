@@ -183,7 +183,6 @@ class _HomePageState extends State<HomePage> {
           onIconPressed: () => context.pushNamed("/cart"),
         ),
         body: PageBlueprint(
-          isHome: true,
           child: Column(
             children: [
               const SizedBox(height: 20),

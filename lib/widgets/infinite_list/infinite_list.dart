@@ -106,29 +106,23 @@ class _InfiniteListState<T> extends State<InfiniteList<T>> {
               )
             : RefreshIndicator(
                 onRefresh: () => controller.refresh(),
-                child: CustomScrollView(
-                  slivers: [
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (ctx, index) {
-                          if (index == controller.data.length) {
-                            if (controller.endOfData) {
-                              return null;
-                            }
-                            controller.fetchData();
-                            return const Center(
-                              child: Loader(
-                                color: ThemeModel.darkBlue,
-                              ),
-                            );
-                          }
+                child: ListView.builder(
+                  itemBuilder: (ctx, index) {
+                    if (index == controller.data.length) {
+                      if (controller.endOfData) {
+                        return null;
+                      }
+                      controller.fetchData();
+                      return const Center(
+                        child: Loader(
+                          color: ThemeModel.darkBlue,
+                        ),
+                      );
+                    }
 
-                          return widget.itemBuilder(controller.data[index], index);
-                        },
-                        childCount: controller.data.length + 1,
-                      ),
-                    ),
-                  ],
+                    return widget.itemBuilder(controller.data[index], index);
+                  },
+                  itemCount: controller.data.length + 1,
                 ),
               );
   }
