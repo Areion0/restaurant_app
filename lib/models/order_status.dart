@@ -10,7 +10,7 @@ class OrderStatus {
   final String name;
   final Color color;
 
-  factory OrderStatus.fromJson(String name) {
+  factory OrderStatus.fromName(String name) {
     switch (name) {
       case 'pending':
         return OrderStatus.pending;

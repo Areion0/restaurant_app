@@ -5,25 +5,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
 import 'package:restaurant_app/auth/auth_controller.dart';
 import 'package:restaurant_app/models/product.dart';
+import 'package:restaurant_app/models/product_gallery.dart';
 
 import '../models/customer_order.dart';
-import 'storage_controller.dart';
+import '../models/gallery_type.dart';
 
 class FirestoreController {
-  static Future<List> getCollection(String collection) async {
+  static Future<QuerySnapshot<Map<String, dynamic>>> getCollection(String collection) {
     var db = FirebaseFirestore.instance;
 
-    List<Map<String, dynamic>> list = [];
-
-    await db.collection(collection).get().then((collection) {
-      for (var doc in collection.docs) {
-        list.add(doc.data());
-      }
-    }).catchError((e) {
-      throw Exception("Failed to get collection: $e");
-    });
-
-    return list;
+    return db.collection(collection).get();
   }
 
   /// Converts a Firestore document snapshot to a Dart object
@@ -123,16 +114,71 @@ class FirestoreController {
     }
   }
 
-  static Future<List<Product>> getProducts() async {
-    var productList = await getCollection('products');
-    List<Product> products = [];
+  static Future<List<ProductGallery>> getProductGalleries() async {
+    var db = FirebaseFirestore.instance;
 
-    for (var productData in productList.cast<Map<String, dynamic>>()) {
-      var imageURL = await StorageController.getFileURL(productData["imageID"] ?? "") ?? "";
-      products.add(Product.fromMap(productData, imageURL: imageURL));
+    QuerySnapshot<Map<String, dynamic>> galleryQuery = await db.collection("galleries").get();
+
+    List<String> productIDs = List<String>.from(galleryQuery.docs
+        .map((e) => e.data()["products"])
+        .toList()
+        .expand(
+          (element) => element,
+        )
+        .toList());
+
+    QuerySnapshot<Map<String, dynamic>> productQuery = await db
+        .collection("products")
+        .where(
+          FieldPath.documentId,
+          whereIn: productIDs,
+        )
+        .get();
+
+    List<ProductGallery> productGalleries = [];
+    for (var gallery in galleryQuery.docs) {
+      List<Product> products = [];
+      for (var product in productQuery.docs) {
+        if ((gallery.data()["products"] as List).contains(product.id)) {
+          products.add(Product.fromMap(product.data()));
+        }
+      }
+      productGalleries.add(ProductGallery(
+        type: GalleryType.fromName(gallery.id)!,
+        products: products,
+      ));
     }
 
-    return products;
+    Logger().i("Product galleries: ${productGalleries.length}");
+
+    return productGalleries;
+  }
+
+  static Future<List<CustomerOrder>> fetchMyOrders() async {
+    var db = FirebaseFirestore.instance;
+
+    List<CustomerOrder> orders = [];
+
+    try {
+      await db
+          .collection("users")
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection("orders")
+          .orderBy("date", descending: true)
+          .get()
+          .then((collection) {
+        for (var doc in collection.docs) {
+          orders.add(CustomerOrder.fromMap(doc.data(), id: doc.id));
+        }
+      });
+
+      Logger().i("Orders fetched successfully");
+    } catch (e, s) {
+      Logger().e("Failed to fetch orders: ${e.toString()}");
+      Logger().e(s);
+    }
+
+    return orders;
   }
 
   static Future<void> submitOrder(CustomerOrder customerOrder) async {

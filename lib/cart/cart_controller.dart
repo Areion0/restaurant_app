@@ -3,7 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
+import 'package:provider/provider.dart';
 import 'package:restaurant_app/cart/cart_item_compact.dart';
+import 'package:restaurant_app/home/home_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 
 import '../firebase/firestore_controller.dart';
@@ -52,7 +54,7 @@ class CartController extends ChangeNotifier {
     await FirestoreController.submitOrder(
       CustomerOrder(
         date: DateTime.now(),
-        products: products,
+        productIDs: products.map((product) => product.id).toList(),
         total: products.fold(0.0, (sum, product) => sum + product.price),
         customerID: context.authController.user!.uid,
         status: OrderStatus.pending,
@@ -61,7 +63,10 @@ class CartController extends ChangeNotifier {
 
     Fluttertoast.showToast(msg: "✅ Order submitted!");
 
-    if (context.mounted) context.popToHome();
+    if (context.mounted) {
+      context.read<HomeController>().refreshData();
+      context.popToHome();
+    }
 
     clear();
   }

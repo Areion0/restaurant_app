@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:restaurant_app/auth/auth_controller.dart';
 import 'package:restaurant_app/cart/cart_controller.dart';
 import 'package:restaurant_app/cart/cart_view.dart';
+import 'package:restaurant_app/home/home_controller.dart';
 import 'package:restaurant_app/home/home_page.dart';
 import 'package:restaurant_app/login/login_view.dart';
 import 'package:restaurant_app/theme/theme_model.dart';
@@ -25,6 +26,7 @@ void main() async {
   runApp(
     MultiProvider(providers: [
       ChangeNotifierProvider(create: (_) => AuthController()),
+      ChangeNotifierProvider(create: (_) => HomeController()),
       ChangeNotifierProvider(create: (_) => CartController()),
     ], child: const RestaurantApp()),
   );

@@ -1,24 +1,30 @@
 class Product {
+  late final String id;
   late final String name;
   late final String description;
   late final double price;
-  String? imageID;
   String? imageURL;
 
-  Product({required this.name, required this.description, required this.price, this.imageURL});
+  Product({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.price,
+    this.imageURL,
+  });
 
-  Product.fromMap(Map<String, dynamic> map, {this.imageURL}) {
-    name = map["name"];
-    description = map["description"] ?? "";
-    price = map["price"];
-    imageID = map["imageID"];
-  }
+  factory Product.fromMap(Map<String, dynamic> map) => Product(
+        id: map["id"] ?? "",
+        name: map["name"],
+        description: map["description"] ?? "",
+        price: map["price"],
+        imageURL: map["imageURL"] ?? "",
+      );
 
   Map<String, dynamic> toMap() => {
         "name": name,
         "description": description,
         "price": price,
-        "imageID": imageID ?? "",
         "imageURL": imageURL ?? "",
       };
 }

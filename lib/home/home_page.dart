@@ -5,16 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/auth/auth_controller.dart';
-import 'package:restaurant_app/firebase/firestore_controller.dart';
+import 'package:restaurant_app/cart/cart_controller.dart';
+import 'package:restaurant_app/home/home_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/widgets/custom_appbar.dart';
 import 'package:restaurant_app/widgets/item_gallery.dart';
 import 'package:restaurant_app/widgets/page_blueprint.dart';
 
-import '../models/product.dart';
-import '../product/product_page.dart';
 import '../theme/theme_model.dart';
-import '../widgets/image_button.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -26,10 +24,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   StreamSubscription<User?>? _authStateChanges;
 
-  bool firstTime = true;
-  bool fetching = false;
-
-  List<Product> products = [];
+  late HomeController homeController;
 
   @override
   void initState() {
@@ -61,144 +56,110 @@ class _HomePageState extends State<HomePage> {
   void didChangeDependencies() async {
     super.didChangeDependencies();
 
-    if (firstTime) {
-      firstTime = false;
+    homeController = context.watch<HomeController>();
 
-      Logger logger = Logger();
-      try {
-        setState(() => fetching = true);
-        products = await FirestoreController.getProducts();
-        items = await Future.wait(
-          products.map(
-            (product) async {
-              return ImageButton(
-                imageUrl: product.imageURL ?? "",
-                onTap: () => context.push(
-                  ProductPage(product: product),
-                ),
-              );
-            },
-          ),
-        );
-        setState(() {});
-      } on Exception catch (e) {
-        logger.e("Failed to get products: $e");
-      } finally {
-        setState(() => fetching = false);
-      }
+    if (homeController.firstTime) {
+      homeController.firstTime = false;
+
+      await homeController.prepareGalleries();
     }
   }
-
-  List<String> titles = [
-    "Recent Orders",
-    "Most Popular",
-    "Just Added",
-    "Recommended",
-  ];
-
-  List<Widget> prefixes = const [
-    Icon(
-      Icons.shopping_bag_outlined,
-      color: ThemeModel.darkBlue,
-      size: 26,
-    ),
-    Text(
-      "🔥",
-      style: TextStyle(fontSize: 20),
-    ),
-    Text(
-      "✨",
-      style: TextStyle(fontSize: 20),
-    ),
-    Text(
-      "👇",
-      style: TextStyle(fontSize: 20),
-    ),
-  ];
-
-  List<ImageButton> items = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: CustomAppbar(
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 5),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(50),
-              onTap: () => context.pushNamed("/profile"),
-              child: Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: ThemeModel.darkGrey,
-                          width: 3,
+      appBar: CustomAppbar(
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 5),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(50),
+            onTap: () => context.pushNamed("/profile"),
+            child: Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: Row(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: ThemeModel.darkGrey,
+                        width: 3,
+                      ),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: CircleAvatar(
+                      backgroundImage: context.authController.user?.photoURL == null ||
+                              context.authController.user!.photoURL!.isEmpty
+                          ? null
+                          : NetworkImage(context.authController.user!.photoURL!),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Selector<AuthController, User?>(
+                    selector: (ctx, auth) => auth.user,
+                    builder: (context, user, child) => Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user?.displayName?.split(" ").first ?? "",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: CircleAvatar(
-                        backgroundImage: context.authController.user?.photoURL == null ||
-                                context.authController.user!.photoURL!.isEmpty
-                            ? null
-                            : NetworkImage(context.authController.user!.photoURL!),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Selector<AuthController, User?>(
-                      selector: (ctx, auth) => auth.user,
-                      builder: (context, user, child) => Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            user?.displayName?.split(" ").first ?? "",
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        Text(
+                          user?.displayName?.split(" ").last ?? "",
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
                           ),
-                          Text(
-                            user?.displayName?.split(" ").last ?? "",
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
-          icon: const Icon(
-            Icons.shopping_cart_outlined,
-            size: 35,
-          ),
-          onIconPressed: () => context.pushNamed("/cart"),
         ),
-        body: PageBlueprint(
-          child: Column(
-            children: [
-              const SizedBox(height: 20),
-              Container(
-                height: context.screenSize.height * 0.85,
-                child: ItemGallery(
-                  title: titles[0],
-                  prefix: prefixes[0],
-                  items: items,
-                  fetching: fetching,
+        icon: Selector<CartController, int>(
+            selector: (ctx, cart) => cart.items.length,
+            builder: (context, itemCount, child) {
+              return Badge(
+                isLabelVisible: itemCount > 0,
+                label: Text(
+                  itemCount.toString(),
+                  style: ThemeModel.theme.textTheme.bodyMedium?.copyWith(
+                    color: ThemeModel.lightGrey,
+                  ),
                 ),
-                // separatorBuilder: (context, index) => const SizedBox(height: 30),
-                // ),
+                child: const Icon(
+                  Icons.shopping_cart_outlined,
+                  size: 35,
+                ),
+              );
+            }),
+        onIconPressed: () => context.pushNamed("/cart"),
+      ),
+      body: PageBlueprint(
+        fetching: homeController.fetching || homeController.recentOrdersGallery == null,
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Container(
+              height: context.screenSize.height * 0.85,
+              child: ListView.separated(
+                separatorBuilder: (context, index) => const SizedBox(height: 30),
+                itemCount: homeController.galleries.length + 1,
+                itemBuilder: (ctx, index) => ItemGallery(
+                  gallery: index == 0 ? homeController.recentOrdersGallery! : homeController.galleries[index - 1],
+                ),
               ),
-            ],
-          ),
-        ));
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

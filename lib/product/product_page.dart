@@ -106,19 +106,19 @@ class _ProductPageState extends State<ProductPage> {
                 ],
               ),
             ),
-            // Similar products
-            Padding(
-              padding: const EdgeInsets.only(left: 20),
-              child: ItemGallery(
-                title: "Combine With 🍗 + 🥗",
-                items: List.generate(
-                    3,
-                    (index) => ImageButton(
-                          imageUrl: "https://via.placeholder.com/150",
-                          onTap: () {},
-                        )),
-              ),
-            )
+            // TODO: Similar products
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 20),
+            //   child: ItemGallery(
+            //     title: "Combine With 🍗 + 🥗",
+            //     gallery: List.generate(
+            //         3,
+            //         (index) => ImageButton(
+            //               imageUrl: "https://via.placeholder.com/150",
+            //               onTap: () {},
+            //             )),
+            //   ),
+            // )
           ],
         ),
       ),

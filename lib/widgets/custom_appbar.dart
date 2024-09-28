@@ -12,7 +12,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
 
   final Widget? leading;
   final Widget? title;
-  final Icon? icon;
+  final Widget? icon;
   final void Function()? onIconPressed;
 
   @override

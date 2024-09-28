@@ -1,21 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
+import 'package:restaurant_app/misc/extensions.dart';
+import 'package:restaurant_app/models/product_gallery.dart';
 import 'package:restaurant_app/theme/theme_model.dart';
 import 'package:restaurant_app/widgets/image_button.dart';
 
-import 'loader.dart';
+import '../product/product_page.dart';
 
-class ItemGallery extends StatelessWidget {
-  final String title;
-  final Widget? prefix;
-  final List<ImageButton> items;
-  final bool fetching;
+class ItemGallery extends StatefulWidget {
+  final ProductGallery gallery;
   const ItemGallery({
-    required this.title,
-    this.prefix,
-    required this.items,
-    this.fetching = false,
+    required this.gallery,
     super.key,
   });
+
+  @override
+  State<ItemGallery> createState() => _ItemGalleryState();
+}
+
+class _ItemGalleryState extends State<ItemGallery> {
+  List<ImageButton> productButtons = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    productButtons = widget.gallery.products
+        .map((product) => ImageButton(
+              imageUrl: product.imageURL ?? "",
+              onTap: () => context.push(ProductPage(product: product)),
+            ))
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,11 +41,11 @@ class ItemGallery extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Icon
-            prefix ?? Container(),
+            widget.gallery.type.icon,
+            const Gap(5),
             // Title
-            const SizedBox(width: 5),
             Text(
-              title,
+              widget.gallery.type.title,
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -38,30 +54,27 @@ class ItemGallery extends StatelessWidget {
           ],
         ),
 
-        const SizedBox(height: 10),
+        const Gap(10),
 
         // Image Buttons
         Container(
           height: 120,
-          child: fetching
-              ? const Center(child: Loader(color: ThemeModel.darkBlue))
-              : items.isEmpty
-                  ? const Center(
-                      child: Text(
-                        "No items found",
-                        style: TextStyle(
-                          color: ThemeModel.darkGrey,
-                          fontSize: 16,
-                        ),
-                      ),
-                    )
-                  : ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: items.length,
-                      itemBuilder: (context, index) {
-                        return Container(width: 140, child: items[index]);
-                      },
+          child: widget.gallery.products.isEmpty
+              ? Center(
+                  child: Text(
+                    "No items found",
+                    style: ThemeModel.theme.textTheme.bodyLarge!.copyWith(
+                      color: ThemeModel.darkGrey,
                     ),
+                  ),
+                )
+              : ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: widget.gallery.products.length,
+                  itemBuilder: (context, index) {
+                    return Container(width: 140, child: productButtons[index]);
+                  },
+                ),
         )
       ],
     );

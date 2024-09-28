@@ -7,7 +7,7 @@ class CustomerOrder {
   final DateTime date;
   final double total;
   final OrderStatus status;
-  final List<Product> products;
+  final List<String> productIDs;
   final String customerID;
 
   CustomerOrder({
@@ -15,7 +15,7 @@ class CustomerOrder {
     required this.date,
     required this.total,
     required this.status,
-    required this.products,
+    required this.productIDs,
     required this.customerID,
   });
 
@@ -23,8 +23,8 @@ class CustomerOrder {
         id: id,
         date: DateTime.parse(json["date"] ?? ""),
         total: json["total"] ?? 0.0,
-        status: OrderStatus.fromJson(json["status"] ?? ""),
-        products: ((json["products"] ?? "") as List).map((product) => Product.fromMap(product)).toList(),
+        status: OrderStatus.fromName(json["status"] ?? ""),
+        productIDs: List<String>.from(json["products"] ?? []),
         customerID: json["customerID"] ?? "",
       );
 
@@ -33,7 +33,7 @@ class CustomerOrder {
       "date": date.toIso8601String(),
       "total": total,
       "status": status.name,
-      "products": products.map((product) => product.toMap()).toList(),
+      "products": productIDs,
       "customerID": customerID,
     };
 
