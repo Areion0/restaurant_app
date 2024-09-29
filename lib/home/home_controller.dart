@@ -54,6 +54,11 @@ class HomeController extends ChangeNotifier {
       productsToFetch.retainWhere((product) => productIDs.add(product));
       productsToFetch = productsToFetch.sublist(0, limit > productsToFetch.length ? productsToFetch.length : limit);
 
+      if (productsToFetch.isEmpty) {
+        recentOrdersGallery = null;
+        return;
+      }
+
       List<Product> products = await FirebaseFirestore.instance
           .collection("products")
           .where("id", whereIn: productsToFetch)

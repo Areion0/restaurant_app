@@ -143,7 +143,8 @@ class _HomePageState extends State<HomePage> {
         onIconPressed: () => context.pushNamed("/cart"),
       ),
       body: PageBlueprint(
-        fetching: homeController.fetching || homeController.recentOrdersGallery == null,
+        fetching: homeController.fetching,
+        error: homeController.galleries.isEmpty,
         child: Column(
           children: [
             const SizedBox(height: 20),
@@ -151,9 +152,13 @@ class _HomePageState extends State<HomePage> {
               height: context.screenSize.height * 0.85,
               child: ListView.separated(
                 separatorBuilder: (context, index) => const SizedBox(height: 30),
-                itemCount: homeController.galleries.length + 1,
+                itemCount: homeController.galleries.length + (homeController.recentOrdersGallery != null ? 1 : 0),
                 itemBuilder: (ctx, index) => ItemGallery(
-                  gallery: index == 0 ? homeController.recentOrdersGallery! : homeController.galleries[index - 1],
+                  gallery: homeController.recentOrdersGallery != null
+                      ? index == 0
+                          ? homeController.recentOrdersGallery!
+                          : homeController.galleries[index - 1]
+                      : homeController.galleries[index],
                 ),
               ),
             ),

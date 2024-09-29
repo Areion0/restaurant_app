@@ -11,16 +11,30 @@ class ImageButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(20),
-      splashColor: ThemeModel.darkBlue,
-      onTap: onTap,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: CachedNetworkImage(
-          imageUrl: imageUrl,
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          height: 110,
+          width: 130,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: CachedNetworkImage(
+              fit: BoxFit.cover,
+              imageUrl: imageUrl,
+            ),
+          ),
         ),
-      ),
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(20),
+            splashColor: ThemeModel.darkBlue.withOpacity(0.2),
+            onTap: onTap,
+            child: Ink(),
+          ),
+        ),
+      ],
     );
   }
 }
