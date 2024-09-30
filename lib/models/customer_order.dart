@@ -1,5 +1,3 @@
-import 'package:restaurant_app/models/product.dart';
-
 import 'order_status.dart';
 
 class CustomerOrder {

@@ -2,13 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/widgets/custom_appbar.dart';
-import 'package:restaurant_app/widgets/image_button.dart';
-import 'package:restaurant_app/widgets/item_gallery.dart';
 import 'package:restaurant_app/widgets/page_blueprint.dart';
 
-import '../cart/cart_item.dart';
 import '../models/product.dart';
 import '../theme/theme_model.dart';
+import '../widgets/buttons/quantity_button.dart';
 import '../widgets/loader.dart';
 
 class ProductPage extends StatefulWidget {
@@ -68,37 +66,13 @@ class _ProductPageState extends State<ProductPage> {
                         ),
                       ),
 
-                      // TODO: Replace with new button that increments/decrements the quantity in cart
-                      // Animates between ["Add to cart"] <-> [- "1" +]
                       // Add to cart
                       Container(
-                        height: 65,
-                        width: context.screenSize.width * 0.6,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            context.cartController.add(CartItem(product: widget.product));
-                            context.pop();
-                          },
-                          child: RichText(
-                            text: TextSpan(
-                              text: "Add To Cart",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge!
-                                  .copyWith(fontSize: 22, fontWeight: FontWeight.normal, color: ThemeModel.lightGrey),
-                              children: [
-                                TextSpan(
-                                  text: " € ${widget.product.price}",
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge!
-                                      .copyWith(fontSize: 22, color: ThemeModel.lightGrey),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                          height: 65,
+                          width: context.screenSize.width * 0.6,
+                          child: QuantityButton(
+                            product: widget.product,
+                          )),
 
                       const SizedBox(height: 40),
                     ],

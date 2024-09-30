@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_final_fields
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
@@ -35,6 +36,26 @@ class CartController extends ChangeNotifier {
   void remove(CartItem item) {
     _items.remove(item);
     compactItems.removeWhere((element) => element.product == item.product);
+    notifyListeners();
+  }
+
+  int quantityOfProduct(Product product) => items
+      .where(
+        (cartItem) => cartItem.product.id == product.id,
+      )
+      .length;
+
+  void addProduct(Product product) => add(CartItem(product: product));
+
+  void removeProduct(Product product) {
+    CartItem? itemToRemove = _items.firstWhereOrNull((element) => element.product.id == product.id);
+
+    if (itemToRemove == null) return;
+
+    _items.remove(itemToRemove);
+    compactItems.removeWhere(
+      (element) => element.product.id == product.id,
+    );
     notifyListeners();
   }
 
