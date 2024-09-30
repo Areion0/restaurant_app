@@ -161,13 +161,13 @@ class _CheckoutViewState extends State<CheckoutView> {
                       child: ListView.separated(
                           itemBuilder: (context, index) => Padding(
                                 padding: EdgeInsets.only(
-                                    top: index == 0 ? 20 : 0, bottom: index == cart.compactItems.length - 1 ? 20 : 0),
-                                child: cart.compactItems[index],
+                                    top: index == 0 ? 20 : 0, bottom: index == cart.compactCartItems.length - 1 ? 20 : 0),
+                                child: cart.compactCartItems[index],
                               ),
                           separatorBuilder: (context, index) => const SizedBox(
                                 height: 20,
                               ),
-                          itemCount: cart.compactItems.length),
+                          itemCount: cart.compactCartItems.length),
                     ),
 
                     // Separator

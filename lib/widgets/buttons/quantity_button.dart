@@ -25,7 +25,7 @@ class _QuantityButtonState extends State<QuantityButton> with TickerProviderStat
   }
 
   bool get productInCart => cartController.items.any(
-        (cartItem) => cartItem.product.id == widget.product.id,
+        (cartItem) => cartItem.id == widget.product.id,
       );
 
   double get addToCartOpacity {

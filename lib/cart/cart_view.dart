@@ -29,7 +29,7 @@ class _CartViewState extends State<CartView> {
   Widget build(BuildContext context) => Scaffold(
         appBar: CustomAppbar(
           title: Text(
-            "Order Summary",
+            "Cart",
             style: ThemeModel.theme.textTheme.titleMedium,
           ),
           icon: const Icon(Icons.remove_shopping_cart_outlined, color: ThemeModel.darkRed, size: 35),
@@ -73,12 +73,12 @@ class _CartViewState extends State<CartView> {
                               itemBuilder: (context, index) => Padding(
                                     padding: EdgeInsets.only(
                                         top: index == 0 ? 20 : 0, bottom: index == cart.items.length - 1 ? 20 : 0),
-                                    child: cart.items[index],
+                                    child: cart.cartItems[index],
                                   ),
                               separatorBuilder: (context, index) => const SizedBox(
                                     height: 20,
                                   ),
-                              itemCount: cart.items.length),
+                              itemCount: cart.cartItems.length),
                     ),
                     SizedBox(height: context.screenSize.height * 0.04),
                     Container(

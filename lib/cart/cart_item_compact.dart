@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 
 import '../models/product.dart';
 import '../theme/theme_model.dart';
 import '../widgets/rectangle_box.dart';
+import 'cart_controller.dart';
 
 class CartItemCompact extends StatelessWidget {
   final Product product;
@@ -71,7 +73,13 @@ class CartItemCompact extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 // Quantity
-                const Text("x1"),
+                Selector<CartController, int>(
+                    selector: (context, cart) => cart.items
+                        .where(
+                          (element) => element.id == product.id,
+                        )
+                        .length,
+                    builder: (context, quantity, child) => Text("x$quantity")),
 
                 // Price
                 Text("€ ${product.price}"),

@@ -1,6 +1,5 @@
 // ignore_for_file: prefer_final_fields
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logger/logger.dart';
@@ -16,67 +15,73 @@ import '../models/product.dart';
 import 'cart_item.dart';
 
 class CartController extends ChangeNotifier {
-  List<CartItem> _items = [];
-  List<CartItemCompact> compactItems = [];
+  List<CartItem> _cartItems = [];
 
-  List<CartItem> get items => _items;
+  List<CartItem> get cartItems => _cartItems;
 
-  set items(List<CartItem> value) {
+  set cartItems(List<CartItem> value) {
+    _cartItems = value;
+    notifyListeners();
+  }
+
+  List<Product> _items = [];
+  List<CartItemCompact> compactCartItems = [];
+
+  List<Product> get items => _items;
+
+  set items(List<Product> value) {
     _items = value;
-    compactItems = value.map((e) => CartItemCompact(product: e.product)).toList();
+
+    cartItems = value.map((e) => CartItem(product: e)).toList();
+    compactCartItems = value.map((e) => CartItemCompact(product: e)).toList();
     notifyListeners();
   }
 
-  void add(CartItem item) {
+  void addProduct(Product item) {
+    if (!items.contains(item)) {
+      cartItems.add(CartItem(product: item));
+      compactCartItems.add(CartItemCompact(product: item));
+    }
+
     _items.add(item);
-    compactItems.add(CartItemCompact(product: item.product));
     notifyListeners();
   }
 
-  void remove(CartItem item) {
+  void removeProduct(Product item) {
+    if (items.where((element) => element.id == item.id).length < 2) {
+      cartItems.removeWhere((element) => element.product == item);
+      compactCartItems.removeWhere((element) => element.product == item);
+    }
+
     _items.remove(item);
-    compactItems.removeWhere((element) => element.product == item.product);
+
     notifyListeners();
   }
 
   int quantityOfProduct(Product product) => items
       .where(
-        (cartItem) => cartItem.product.id == product.id,
+        (cartItem) => cartItem.id == product.id,
       )
       .length;
 
-  void addProduct(Product product) => add(CartItem(product: product));
-
-  void removeProduct(Product product) {
-    CartItem? itemToRemove = _items.firstWhereOrNull((element) => element.product.id == product.id);
-
-    if (itemToRemove == null) return;
-
-    _items.remove(itemToRemove);
-    compactItems.removeWhere(
-      (element) => element.product.id == product.id,
-    );
-    notifyListeners();
-  }
-
   void clear() {
     _items.clear();
-    compactItems.clear();
+
+    cartItems.clear();
+    compactCartItems.clear();
     notifyListeners();
   }
 
-  double get totalPrice => _items.fold(0, (previousValue, element) => previousValue + element.product.price);
+  double get totalPrice => _items.fold(0, (previousValue, product) => previousValue + product.price);
 
   Future<void> onSubmit(BuildContext context) async {
-    List<Product> products = items.map((item) => item.product).toList();
-
-    Logger().i("Sending order with ${products.length} products...");
+    Logger().i("Sending order with ${items.length} products...");
 
     await FirestoreController.submitOrder(
       CustomerOrder(
         date: DateTime.now(),
-        productIDs: products.map((product) => product.id).toList(),
-        total: products.fold(0.0, (sum, product) => sum + product.price),
+        productIDs: items.map((product) => product.id).toList(),
+        total: items.fold(0.0, (sum, product) => sum + product.price),
         customerID: context.authController.user!.uid,
         status: OrderStatus.pending,
       ),
