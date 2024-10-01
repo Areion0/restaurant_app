@@ -38,7 +38,7 @@ class CartController extends ChangeNotifier {
   }
 
   void addProduct(Product item) {
-    if (!items.contains(item)) {
+    if (!items.any((element) => element.id == item.id)) {
       cartItems.add(CartItem(product: item));
       compactCartItems.add(CartItemCompact(product: item));
     }
@@ -49,11 +49,15 @@ class CartController extends ChangeNotifier {
 
   void removeProduct(Product item) {
     if (items.where((element) => element.id == item.id).length < 2) {
-      cartItems.removeWhere((element) => element.product == item);
-      compactCartItems.removeWhere((element) => element.product == item);
+      cartItems.removeWhere((element) => element.product.id == item.id);
+      compactCartItems.removeWhere((element) => element.product.id == item.id);
     }
 
-    _items.remove(item);
+    int productIndex = _items.indexWhere((element) => element.id == item.id);
+
+    if (productIndex != -1) {
+      _items.removeAt(productIndex);
+    }
 
     notifyListeners();
   }

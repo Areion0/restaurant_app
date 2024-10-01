@@ -27,21 +27,23 @@ extension BuildContextExtensions on BuildContext {
   void popToHome() => popUntil("/home");
 
   /// Pushes the given Widget
-  void push(Widget route, {String? name}) => navigator.push(animatedPageRoute(route, name: name));
+  void push(Widget route, {String? name, Object? arguments}) =>
+      navigator.push(animatedPageRoute(route, name: name, arguments: arguments));
 
   /// Pushes the route with the given name
-  void pushNamed(String routeName) => navigator.pushNamed(routeName);
+  void pushNamed(String routeName, {Object? arguments}) => navigator.pushNamed(routeName, arguments: arguments);
 
   /// Pushes the given Widget and removes all the previous routes
-  void pushAndRemoveAll(Widget route, {String? name}) => navigator.pushAndRemoveUntil(
-        animatedPageRoute(route, name: name),
+  void pushAndRemoveAll(Widget route, {String? name, Object? arguments}) => navigator.pushAndRemoveUntil(
+        animatedPageRoute(route, name: name, arguments: arguments),
         (route) => false,
       );
 
   /// Pushes the route with the given name and removes all the previous routes
-  void pushNamedAndRemoveAll(String routeName) => navigator.pushNamedAndRemoveUntil(
+  void pushNamedAndRemoveAll(String routeName, {Object? arguments}) => navigator.pushNamedAndRemoveUntil(
         routeName,
         (route) => false,
+        arguments: arguments,
       );
   void goToLogin() => pushNamedAndRemoveAll("/login");
 
@@ -51,9 +53,9 @@ extension BuildContextExtensions on BuildContext {
 }
 
 // Wrapper to animate routes
-PageRouteBuilder animatedPageRoute(Widget route, {String? name}) => PageRouteBuilder(
+PageRouteBuilder animatedPageRoute(Widget route, {String? name, Object? arguments}) => PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => route,
-      settings: RouteSettings(name: name),
+      settings: RouteSettings(name: name, arguments: arguments),
       transitionDuration: const Duration(milliseconds: 150),
       reverseTransitionDuration: const Duration(milliseconds: 150),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -70,7 +72,7 @@ PageRouteBuilder animatedPageRoute(Widget route, {String? name}) => PageRouteBui
 
 /// Wrapper to animate named routes
 RouteFactory animatedRouter(Map<String, Widget> routes) =>
-    (settings) => animatedPageRoute(routes[settings.name]!, name: settings.name);
+    (settings) => animatedPageRoute(routes[settings.name]!, name: settings.name, arguments: settings.arguments);
 
 extension MapExtensions on Map {
   /// Returns the pretty formatted JSON string of the [Map].

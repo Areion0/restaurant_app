@@ -8,7 +8,7 @@ import 'package:restaurant_app/widgets/infinite_list/infinite_list_controller.da
 import 'package:restaurant_app/widgets/orders/order_panel.dart';
 import 'package:restaurant_app/widgets/page_blueprint.dart';
 
-import '../theme/theme_model.dart';
+import '../../theme/theme_model.dart';
 
 class MyOrdersView extends StatefulWidget {
   const MyOrdersView({super.key});
@@ -34,9 +34,9 @@ class _MyOrdersViewState extends State<MyOrdersView> {
             collection: "users/${context.authController.user!.uid}/orders",
             noItemsText: "No orders found",
             loadingText: "Loading orders...",
-            itemBuilder: (item, index) => OrderPanel(order: item),
-            fromJson: (item, id) => CustomerOrder.fromMap(item, id: id),
-            toJson: (object) => object.toMap(),
+            itemBuilder: (order, index) => OrderPanel(order: order),
+            fromJson: (order, id) => CustomerOrder.fromMap(order, id: id),
+            toJson: (order) => order.toMap(),
           ),
         ),
       ),

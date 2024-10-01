@@ -90,6 +90,24 @@ class FirestoreController {
     return data;
   }
 
+  static Future<List<Map<String, dynamic>>> getDocumentsWhereIn(
+    String collection,
+    Object field,
+    List<String> ids,
+  ) async {
+    var db = FirebaseFirestore.instance;
+
+    List<Map<String, dynamic>> data = [];
+
+    await db
+        .collection(collection)
+        .where(field, whereIn: ids)
+        .get()
+        .then((query) => data = query.docs.map((e) => e.data()).toList());
+
+    return data;
+  }
+
   static Future<void> addDocument({
     String? docName,
     required String collection,

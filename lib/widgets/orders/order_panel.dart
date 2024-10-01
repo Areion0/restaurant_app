@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-import 'package:logger/logger.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/models/customer_order.dart';
 import 'package:restaurant_app/theme/theme_model.dart';
@@ -14,7 +13,7 @@ class OrderPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(20),
-      onTap: () => Logger().i("Order ${order.id} tapped"),
+      onTap: () => context.pushNamed("/order", arguments: order),
       child: Card(
         // color: ThemeModel.darkBlue,
         child: Padding(
@@ -29,7 +28,7 @@ class OrderPanel extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                       Icon(
+                      Icon(
                         Icons.circle,
                         color: order.status.color,
                         size: 20,

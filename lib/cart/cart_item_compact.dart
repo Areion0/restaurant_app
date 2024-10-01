@@ -4,6 +4,7 @@ import 'package:restaurant_app/misc/extensions.dart';
 
 import '../models/product.dart';
 import '../theme/theme_model.dart';
+import '../widgets/photos/custom_cached_network_image.dart';
 import '../widgets/rectangle_box.dart';
 import 'cart_controller.dart';
 
@@ -29,10 +30,7 @@ class CartItemCompact extends StatelessWidget {
               child: Container(
                 height: width * 0.25,
                 width: width * 0.25,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: ThemeModel.darkBlue,
-                ),
+                child: CustomCachedNetworkImage(imageUrl: product.imageURL ?? ""),
               ),
             ),
             Column(
