@@ -1,8 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/widgets/custom_appbar.dart';
 import 'package:restaurant_app/widgets/page_blueprint.dart';
+import 'package:restaurant_app/widgets/photos/custom_cached_network_image.dart';
 
 import '../models/product.dart';
 import '../theme/theme_model.dart';
@@ -51,9 +51,7 @@ class _ProductPageState extends State<ProductPage> {
                       // Image
                       widget.product.imageURL == null
                           ? const Loader()
-                          : ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: CachedNetworkImage(imageUrl: widget.product.imageURL!)),
+                          : CustomCachedNetworkImage(imageUrl: widget.product.imageURL!),
 
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 20),

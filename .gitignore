@@ -10,6 +10,7 @@
 .svn/
 migrate_working_dir/
 *.jks
+upload-keystore.jks.base64
 
 # IntelliJ related
 *.iml

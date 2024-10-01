@@ -1,5 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/widgets/photos/custom_cached_network_image.dart';
 
 import '../theme/theme_model.dart';
 
@@ -17,13 +17,7 @@ class ImageButton extends StatelessWidget {
         Container(
           height: 110,
           width: 130,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: CachedNetworkImage(
-              fit: BoxFit.cover,
-              imageUrl: imageUrl,
-            ),
-          ),
+          child: CustomCachedNetworkImage(imageUrl: imageUrl),
         ),
         Material(
           color: Colors.transparent,
@@ -31,7 +25,6 @@ class ImageButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
             splashColor: ThemeModel.darkBlue.withOpacity(0.2),
             onTap: onTap,
-            child: Ink(),
           ),
         ),
       ],
