@@ -14,18 +14,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2  # Fetch the last two commits for comparison
+          fetch-depth: 2 # Fetch the last two commits for comparison
 
       - name: Check if version changed
         id: check_version
         run: |
-          VERSION_CHANGED=$(git diff HEAD^ HEAD pubspec.yaml | grep 'version:')
-          if [ -z "$VERSION_CHANGED" ]; then
+          VERSION_CHANGED=$(git diff HEAD^ HEAD -- pubspec.yaml | grep 'version:')
+          if [[ -z "$VERSION_CHANGED" ]]; then
             echo "Version change not detected."
             echo "::set-output name=version_changed::false"
           else
             echo "Version change detected."
             echo "::set-output name=version_changed::true"
+          fi
 
   build:
     needs: check-version
