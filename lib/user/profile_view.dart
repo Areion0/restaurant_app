@@ -72,7 +72,7 @@ class ProfileView extends StatelessWidget {
             onPressed: () {
               context.pushNamed("/my_orders");
             },
-            child: const Text("My Orders"),
+            child: Text(context.authController.user?.isAdmin ?? false ? "Orders" : "My Orders"),
           ),
 
           // Log Out Button

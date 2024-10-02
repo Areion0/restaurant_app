@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:restaurant_app/firebase/firestore_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
+import 'package:restaurant_app/models/user_model.dart';
 
 import '../theme/theme_model.dart';
 import '../widgets/loader.dart';
@@ -22,18 +24,18 @@ class _SplashViewState extends State<SplashView> {
   void initState() {
     super.initState();
 
-    _authStateChanges = FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      context.authController.user = user;
-
+    _authStateChanges = FirebaseAuth.instance.authStateChanges().listen((User? user) async {
       Logger logger = Logger();
       if (user == null) {
         logger.i("User is currently signed out!");
 
-        context.goToLogin();
+        if (context.mounted) context.goToLogin();
       } else {
-        logger.i("User is signed in!");
+        if (context.mounted)
+          context.authController.user = UserModel.fromMap(await FirestoreController.getDocument("users", user.uid));
 
-        context.pushNamedAndRemoveAll("/home");
+        logger.i("User is signed in!");
+        if (context.mounted) context.pushNamedAndRemoveAll("/home");
       }
     });
   }

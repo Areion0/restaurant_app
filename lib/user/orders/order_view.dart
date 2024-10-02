@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 import 'package:restaurant_app/firebase/firestore_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/models/customer_order.dart';
+import 'package:restaurant_app/models/user_model.dart';
 import 'package:restaurant_app/theme/theme_model.dart';
 import 'package:restaurant_app/widgets/custom_appbar.dart';
+import 'package:restaurant_app/widgets/loader.dart';
 import 'package:restaurant_app/widgets/page_blueprint.dart';
 import 'package:restaurant_app/widgets/photos/custom_cached_network_image.dart';
 import 'package:restaurant_app/widgets/rectangle_box.dart';
@@ -23,6 +24,8 @@ class _OrderViewState extends State<OrderView> {
 
   List<Map<Product, int>> productsWithQuantity = [];
 
+  UserModel? customer;
+
   @override
   void initState() {
     super.initState();
@@ -34,6 +37,7 @@ class _OrderViewState extends State<OrderView> {
             order = ModalRoute.of(context)!.settings.arguments as CustomerOrder;
           });
           fetchProducts();
+          if (context.authController.user!.isAdmin) fetchCustomerDetails();
         }
       },
     );
@@ -61,6 +65,43 @@ class _OrderViewState extends State<OrderView> {
     setState(() {});
   }
 
+  Future<void> fetchCustomerDetails() async {
+    customer = await FirestoreController.getDocument("users", order!.customerID).then(
+      (value) => UserModel.fromMap(value),
+    );
+    setState(() {});
+  }
+
+  double get rectangleBoxHeight {
+    switch (productsWithQuantity.length) {
+      case 0:
+        return 0;
+      case 1:
+        return 160;
+      case 5:
+        return 5 * 80 + 70;
+      case > 5:
+        return 5 * 75 + 70;
+      default:
+        return productsWithQuantity.length * 75 + 70;
+    }
+  }
+
+  double get productListHeight {
+    switch (productsWithQuantity.length) {
+      case 0:
+        return 0;
+      case 1:
+        return 90;
+      case 5:
+        return 5 * 80;
+      case > 5:
+        return 5 * 75;
+      default:
+        return productsWithQuantity.length * 75;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,7 +116,7 @@ class _OrderViewState extends State<OrderView> {
         error: order == null,
         child: Center(
           child: RectangleBox(
-            height: context.height * 0.7,
+            height: context.height * 0.85,
             color: ThemeModel.darkGrey,
             padding: EdgeInsets.zero,
             child: Column(
@@ -88,7 +129,6 @@ class _OrderViewState extends State<OrderView> {
                       color: order?.status.color,
                       size: 50,
                     ),
-                  
                     Text(
                       order?.status.name.capitalize ?? "",
                       style: ThemeModel.theme.textTheme.titleLarge,
@@ -96,31 +136,66 @@ class _OrderViewState extends State<OrderView> {
                   ],
                 ),
 
+                // Customer details
+                if (context.authController.user!.isAdmin)
+                  if (customer == null)
+                    const Loader()
+                  else
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: RectangleBox(
+                        height: 160,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(
+                              "Customer Details",
+                              style: ThemeModel.theme.textTheme.titleMedium,
+                            ),
+                            Text(
+                              customer?.displayName ?? "",
+                              style: ThemeModel.theme.textTheme.bodyLarge,
+                            ),
+                            Text(
+                              customer?.email ?? "",
+                              style: ThemeModel.theme.textTheme.bodyLarge,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
                 // List of products
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: RectangleBox(
-                    height: productsWithQuantity.length * 120.0,
+                    height: rectangleBoxHeight,
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: productsWithQuantity.length,
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              trailing: Text(
-                                productsWithQuantity[index].keys.first.price.price,
-                                style: ThemeModel.theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.normal),
-                              ),
-                              leading: CustomCachedNetworkImage(
-                                  imageUrl: productsWithQuantity[index].keys.first.imageURL ?? ""),
-                              title: Text(productsWithQuantity[index].keys.first.name),
-                              subtitle: Text("x${productsWithQuantity[index].entries.first.value.toString()}"),
-                            );
-                          },
+                        Container(
+                          height: productListHeight,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: productsWithQuantity.length,
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                trailing: Text(
+                                  productsWithQuantity[index].keys.first.price.price,
+                                  style: ThemeModel.theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.normal),
+                                ),
+                                leading: Container(
+                                  height: 60,
+                                  width: 60,
+                                  child: CustomCachedNetworkImage(
+                                      imageUrl: productsWithQuantity[index].keys.first.imageURL ?? ""),
+                                ),
+                                title: Text(productsWithQuantity[index].keys.first.name),
+                                subtitle: Text("x${productsWithQuantity[index].entries.first.value.toString()}"),
+                              );
+                            },
+                          ),
                         ),
-
-                        const Gap(10),
 
                         // Total price
                         Padding(

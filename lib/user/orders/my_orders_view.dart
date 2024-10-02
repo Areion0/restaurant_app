@@ -31,12 +31,14 @@ class _MyOrdersViewState extends State<MyOrdersView> {
         child: ChangeNotifierProvider(
           create: (context) => InfiniteListController<CustomerOrder>(),
           child: InfiniteList<CustomerOrder>(
-            collection: "users/${context.authController.user!.uid}/orders",
+            collection:
+                context.authController.user!.isAdmin ? "orders" : "users/${context.authController.user!.uid}/orders",
             noItemsText: "No orders found",
             loadingText: "Loading orders...",
             itemBuilder: (order, index) => OrderPanel(order: order),
             fromJson: (order, id) => CustomerOrder.fromMap(order, id: id),
             toJson: (order) => order.toMap(),
+            group: context.authController.user!.isAdmin,
           ),
         ),
       ),

@@ -7,6 +7,7 @@ import '../../firebase/firestore_controller.dart';
 class InfiniteListController<T> extends ChangeNotifier {
   void init({
     required String collection,
+    required bool group,
     required int pageSize,
     required String orderBy,
     Map<String, dynamic>? filters,
@@ -15,6 +16,7 @@ class InfiniteListController<T> extends ChangeNotifier {
     required Map<String, dynamic> Function(T object) toJson,
   }) {
     this.collection = collection;
+    this.group = group;
     this.pageSize = pageSize;
     this.orderBy = orderBy;
     this.filters = filters;
@@ -24,6 +26,9 @@ class InfiniteListController<T> extends ChangeNotifier {
   }
 
   late final String collection;
+  // CollectionGroup /////////
+  late final bool group;
+  //////////////////////////
   late final int pageSize;
   late final String orderBy;
   late final Map<String, dynamic>? filters;
@@ -69,7 +74,7 @@ class InfiniteListController<T> extends ChangeNotifier {
 
   Future<void> fetchData() async {
     try {
-      var page = await FirestoreController.getCollectionPaginated<T>(
+      List<T> page = await FirestoreController.getCollectionPaginated<T>(
         collection,
         pageSize: pageSize,
         filters: filters ?? {},
@@ -77,6 +82,7 @@ class InfiniteListController<T> extends ChangeNotifier {
         descending: descending,
         startAfter: lastDocument,
         onLastDocumentInPage: (lastDocument) => this.lastDocument = lastDocument,
+        group: group,
         fromJson: fromJson,
         toJson: toJson,
       );

@@ -13,6 +13,10 @@ class InfiniteList<T> extends StatefulWidget {
   final Map<String, dynamic>? filters;
   final bool descending;
 
+  // CollectionGroup ////////
+  final bool group;
+  //////////////////////////
+
   final String noItemsText;
   final String? loadingText;
 
@@ -33,6 +37,7 @@ class InfiniteList<T> extends StatefulWidget {
     this.descending = true,
     this.noItemsText = "No items found",
     this.loadingText,
+    this.group = false,
     required this.fromJson,
     required this.toJson,
     required this.itemBuilder,
@@ -59,6 +64,7 @@ class _InfiniteListState<T> extends State<InfiniteList<T>> {
       orderBy: widget.orderBy,
       filters: widget.filters,
       descending: widget.descending,
+      group: widget.group,
       fromJson: widget.fromJson,
       toJson: widget.toJson,
     );

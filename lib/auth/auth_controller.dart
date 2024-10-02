@@ -4,14 +4,15 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logger/logger.dart';
 
 import '../firebase/firestore_controller.dart';
+import '../models/user_model.dart';
 
 class AuthController with ChangeNotifier {
   UserCredential? userCredential;
-  User? _user;
+  UserModel? _user;
 
-  User? get user => _user;
+  UserModel? get user => _user;
 
-  set user(User? user) {
+  set user(UserModel? user) {
     _user = user;
     notifyListeners();
   }

@@ -44,6 +44,7 @@ class FirestoreController {
     bool descending = true,
     DocumentSnapshot? startAfter,
     Function(DocumentSnapshot?)? onLastDocumentInPage,
+    bool group = false,
 
     /// The function to convert the Firestore document snapshot to a Dart object
     required T Function(Map<String, dynamic> data, String id) fromJson,
@@ -55,10 +56,21 @@ class FirestoreController {
 
     List<T> list = [];
 
-    Query<T> query = db.collection(collection).orderBy(orderBy, descending: descending).limit(pageSize).withConverter(
-          fromFirestore: (snapshot, options) => fromFirestore(snapshot, fromJson),
-          toFirestore: (value, options) => toFirestore(value, toJson),
-        );
+    late Query<T> query;
+
+    if (group) {
+      query = db.collectionGroup(collection).withConverter(
+            fromFirestore: (snapshot, options) => fromFirestore(snapshot, fromJson),
+            toFirestore: (value, options) => toFirestore(value, toJson),
+          );
+    } else {
+      query = db.collection(collection).withConverter(
+            fromFirestore: (snapshot, options) => fromFirestore(snapshot, fromJson),
+            toFirestore: (value, options) => toFirestore(value, toJson),
+          );
+    }
+
+    query = query.orderBy(orderBy, descending: descending).limit(pageSize);
 
     if (filters.isNotEmpty) {
       filters.forEach((key, value) {

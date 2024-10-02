@@ -8,10 +8,12 @@ import 'package:restaurant_app/auth/auth_controller.dart';
 import 'package:restaurant_app/cart/cart_controller.dart';
 import 'package:restaurant_app/home/home_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
+import 'package:restaurant_app/models/user_model.dart';
 import 'package:restaurant_app/widgets/custom_appbar.dart';
 import 'package:restaurant_app/widgets/item_gallery.dart';
 import 'package:restaurant_app/widgets/page_blueprint.dart';
 
+import '../firebase/firestore_controller.dart';
 import '../theme/theme_model.dart';
 
 class HomePage extends StatefulWidget {
@@ -30,14 +32,14 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    _authStateChanges = FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    _authStateChanges = FirebaseAuth.instance.authStateChanges().listen((User? user) async {
       Logger logger = Logger();
       if (user == null) {
         logger.i("User is currently signed out!");
 
         context.goToLogin();
       } else {
-        context.authController.user = user;
+        context.authController.user ??= UserModel.fromMap(await FirestoreController.getDocument("users", user.uid));
         logger.i("User is signed in!");
       }
     });
@@ -88,28 +90,29 @@ class _HomePageState extends State<HomePage> {
                       ),
                       borderRadius: BorderRadius.circular(50),
                     ),
-                    child: CircleAvatar(
-                      backgroundImage: context.authController.user?.photoURL == null ||
-                              context.authController.user!.photoURL!.isEmpty
-                          ? null
-                          : NetworkImage(context.authController.user!.photoURL!),
-                    ),
+                    child: Selector<AuthController, String?>(
+                        selector: (ctx, auth) => auth.user?.photoURL,
+                        builder: (context, photoURL, child) => CircleAvatar(
+                              backgroundImage: photoURL == null || photoURL.isEmpty
+                                  ? null
+                                  : NetworkImage(context.authController.user!.photoURL),
+                            )),
                   ),
                   const SizedBox(width: 10),
-                  Selector<AuthController, User?>(
+                  Selector<AuthController, UserModel?>(
                     selector: (ctx, auth) => auth.user,
                     builder: (context, user, child) => Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          user?.displayName?.split(" ").first ?? "",
+                          user?.displayName.split(" ").first ?? "",
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          user?.displayName?.split(" ").last ?? "",
+                          user?.displayName.split(" ").last ?? "",
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
