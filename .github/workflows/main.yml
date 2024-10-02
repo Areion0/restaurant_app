@@ -1,15 +1,33 @@
 name: "Build & Release"
 
 on:
-  pull_request:
-    branches:
-      - main
   push:
-    branches:
-      - main
+    paths:
+      - pubspec.yaml
 
 jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version_changed: ${{ steps.check_version.outputs.version_changed }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Check if version changed
+        id: check_version
+        run: |
+          VERSION_CHANGED=$(git diff HEAD^ HEAD pubspec.yaml | grep 'version:')
+          if [ -z "$VERSION_CHANGED" ]; then
+            echo "Version change not detected."
+            echo "::set-output name=version_changed::false"
+          else
+            echo "Version change detected."
+            echo "::set-output name=version_changed::true"
+
   build:
+    needs: check-version
+    if: needs.check-version.outputs.version_changed == 'true'
     name: Build & Release
     runs-on: ubuntu-latest
 
