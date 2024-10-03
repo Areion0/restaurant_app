@@ -82,7 +82,7 @@ class CartController extends ChangeNotifier {
     Logger().i("Sending order with ${items.length} products...");
 
     await FirestoreController.submitOrder(
-      CustomerOrder(
+      CustomerOrder.local(
         date: DateTime.now(),
         productIDs: items.map((product) => product.id).toList(),
         total: items.fold(0.0, (sum, product) => sum + product.price),

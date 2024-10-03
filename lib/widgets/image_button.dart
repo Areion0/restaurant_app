@@ -23,7 +23,7 @@ class ImageButton extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(20),
-            splashColor: ThemeModel.darkBlue.withOpacity(0.2),
+            splashColor: ThemeModel.darkBlue.withOpacity(0.1),
             onTap: onTap,
           ),
         ),

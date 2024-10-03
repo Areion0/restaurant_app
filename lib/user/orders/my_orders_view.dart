@@ -35,7 +35,7 @@ class _MyOrdersViewState extends State<MyOrdersView> {
                 context.authController.user!.isAdmin ? "orders" : "users/${context.authController.user!.uid}/orders",
             noItemsText: "No orders found",
             loadingText: "Loading orders...",
-            itemBuilder: (order, index) => OrderPanel(order: order),
+            itemBuilder: (order, index, onRefresh) => OrderPanel(order: order, onRefresh: onRefresh),
             fromJson: (order, id) => CustomerOrder.fromMap(order, id: id),
             toJson: (order) => order.toMap(),
             group: context.authController.user!.isAdmin,

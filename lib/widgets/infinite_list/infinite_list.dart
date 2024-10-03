@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +28,7 @@ class InfiniteList<T> extends StatefulWidget {
   /// Function to convert an object of type T to a map
   final Map<String, dynamic> Function(T object) toJson;
 
-  final Widget Function(T item, int index) itemBuilder;
+  final Widget Function(T item, int index, FutureOr<void> Function() onRefresh) itemBuilder;
 
   const InfiniteList({
     super.key,
@@ -126,7 +128,7 @@ class _InfiniteListState<T> extends State<InfiniteList<T>> {
                       );
                     }
 
-                    return widget.itemBuilder(controller.data[index], index);
+                    return widget.itemBuilder(controller.data[index], index, controller.refresh);
                   },
                   itemCount: controller.data.length + 1,
                 ),

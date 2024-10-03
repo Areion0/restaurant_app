@@ -1,4 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:gap/gap.dart';
+import 'package:logger/logger.dart';
 import 'package:restaurant_app/firebase/firestore_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/models/customer_order.dart';
@@ -10,6 +15,7 @@ import 'package:restaurant_app/widgets/page_blueprint.dart';
 import 'package:restaurant_app/widgets/photos/custom_cached_network_image.dart';
 import 'package:restaurant_app/widgets/rectangle_box.dart';
 
+import '../../models/order_status.dart';
 import '../../models/product.dart';
 
 class OrderView extends StatefulWidget {
@@ -21,10 +27,13 @@ class OrderView extends StatefulWidget {
 
 class _OrderViewState extends State<OrderView> {
   CustomerOrder? order;
+  FutureOr<void> Function()? onRefresh;
 
   List<Map<Product, int>> productsWithQuantity = [];
 
   UserModel? customer;
+
+  bool updatingStatus = false;
 
   @override
   void initState() {
@@ -33,9 +42,11 @@ class _OrderViewState extends State<OrderView> {
     Future.microtask(
       () {
         if (context.mounted) {
+          final args = ModalRoute.of(context)!.settings.arguments as List<dynamic>;
           setState(() {
-            order = ModalRoute.of(context)!.settings.arguments as CustomerOrder;
+            order = args[0] as CustomerOrder;
           });
+          onRefresh = args[1] as FutureOr<void> Function();
           fetchProducts();
           if (context.authController.user!.isAdmin) fetchCustomerDetails();
         }
@@ -43,9 +54,9 @@ class _OrderViewState extends State<OrderView> {
     );
   }
 
-  /// Fetch the product details
   Future<void> fetchProducts() async {
-    List<Product> products = await FirestoreController.getDocumentsWhereIn("products", "id", order!.productIDs).then(
+    List<Product> totalProducts =
+        await FirestoreController.getDocumentsWhereIn("products", "id", order!.productIDs).then(
       (value) => value
           .map(
             (e) => Product.fromMap(e),
@@ -53,11 +64,11 @@ class _OrderViewState extends State<OrderView> {
           .toList(),
     );
 
-    productsWithQuantity = products
-        .map((e) => {
-              e: order!.productIDs
+    productsWithQuantity = totalProducts
+        .map((product) => {
+              product: order!.productIDs
                   .where(
-                    (element) => element == e.id,
+                    (productID) => productID == product.id,
                   )
                   .length
             })
@@ -122,19 +133,38 @@ class _OrderViewState extends State<OrderView> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Column(
-                  children: [
-                    Icon(
-                      Icons.circle,
-                      color: order?.status.color,
-                      size: 50,
+                if (updatingStatus)
+                  const Loader()
+                else
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: ElevatedButton.icon(
+                      onPressed: context.authController.user!.isAdmin ? onUpdateStatusPressed : null,
+                      style: ThemeModel.theme.elevatedButtonTheme.style?.copyWith(
+                        backgroundColor: WidgetStateProperty.all(ThemeModel.lightGrey),
+                        overlayColor: WidgetStateProperty.all(ThemeModel.darkBlue.withOpacity(0.1)),
+                      ),
+                      icon: context.authController.user!.isAdmin
+                          ? const Icon(
+                              Icons.edit,
+                              color: ThemeModel.darkBlue,
+                            )
+                          : null,
+                      iconAlignment: IconAlignment.end,
+                      label: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            order?.status.icon.withSize(50) ?? const Gap(0),
+                            Text(
+                              order?.status.name.capitalize ?? "",
+                              style: ThemeModel.theme.textTheme.titleLarge,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    Text(
-                      order?.status.name.capitalize ?? "",
-                      style: ThemeModel.theme.textTheme.titleLarge,
-                    ),
-                  ],
-                ),
+                  ),
 
                 // Customer details
                 if (context.authController.user!.isAdmin)
@@ -144,7 +174,7 @@ class _OrderViewState extends State<OrderView> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       child: RectangleBox(
-                        height: 160,
+                        height: 140,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -224,5 +254,66 @@ class _OrderViewState extends State<OrderView> {
         ),
       ),
     );
+  }
+
+  Future<void> onUpdateStatusPressed() async => showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Change status", style: ThemeModel.theme.textTheme.titleLarge),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: OrderStatus.values
+                  .map(
+                    (status) => ListTile(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      enabled: status.name != order!.status.name,
+                      leading:
+                          status.name == order!.status.name ? status.icon.withColor(ThemeModel.darkGrey) : status.icon,
+                      title: Text(
+                        status.name.capitalize,
+                      ),
+                      onTap: () {
+                        Logger().i("Changing status to ${status.name}");
+
+                        updateOrderStatus(status);
+
+                        context.pop();
+                      },
+                    ),
+                  )
+                  .toList(),
+            ),
+          );
+        },
+      );
+
+  void updateOrderStatus(OrderStatus status) async {
+    setState(() {
+      updatingStatus = true;
+    });
+    try {
+      await FirestoreController.updateField(
+          collection: "users/${order!.customerID}/orders", id: order!.id, field: "status", value: status.name);
+      Logger().i("Order status updated successfully");
+      Fluttertoast.showToast(msg: "✅ Order status updated successfully!");
+    } on Exception catch (e) {
+      Logger().e("Failed to update order status: ${e.toString()}");
+      Fluttertoast.showToast(msg: "❌ Failed to update order status, please try again later.");
+      return;
+    } finally {
+      setState(() {
+        updatingStatus = false;
+      });
+    }
+
+    if (!context.mounted) return;
+    setState(() {
+      order = order!.copyWith(status: status);
+    });
+
+    await onRefresh?.call();
   }
 }

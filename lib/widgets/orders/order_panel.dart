@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:restaurant_app/misc/extensions.dart';
@@ -6,16 +8,17 @@ import 'package:restaurant_app/theme/theme_model.dart';
 
 class OrderPanel extends StatelessWidget {
   final CustomerOrder order;
+  final FutureOr<void> Function()? onRefresh;
 
-  const OrderPanel({required this.order, super.key});
+  const OrderPanel({required this.order, this.onRefresh, super.key});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(20),
-      onTap: () => context.pushNamed("/order", arguments: order),
+      onTap: () => context.pushNamed("/order", arguments: [order, onRefresh]),
       child: Card(
-        // color: ThemeModel.darkBlue,
+        color: ThemeModel.lightGrey,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Column(
@@ -28,11 +31,7 @@ class OrderPanel extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        Icons.circle,
-                        color: order.status.color,
-                        size: 20,
-                      ),
+                      order.status.icon,
                       const Gap(10),
                       Text(
                         order.status.name.capitalize,

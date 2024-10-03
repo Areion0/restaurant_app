@@ -89,3 +89,11 @@ extension DateTimeExtensions on DateTime {
   /// Returns the formatted date and time string.
   String get formattedDateTime => "$formattedDate $formattedTime";
 }
+
+extension IconExtensions on Icon {
+  /// Returns the [Icon] with the given [color].
+  Icon withColor(Color color) => Icon(icon, size: size, color: color);
+
+  /// Returns the [Icon] with the given [size].
+  Icon withSize(double size) => Icon(icon, color: color, size: size);
+}

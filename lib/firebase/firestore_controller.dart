@@ -132,6 +132,19 @@ class FirestoreController {
     });
   }
 
+  static Future<void> updateField({
+    required String collection,
+    required String id,
+    required String field,
+    required dynamic value,
+  }) async {
+    var db = FirebaseFirestore.instance;
+
+    await db.collection(collection).doc(id).update({field: value}).catchError((e) {
+      throw Exception("Failed to update field: $e");
+    });
+  }
+
   static Future<void> addNewUser(User user) async {
     try {
       Map<String, dynamic> userData = user.toMap();
