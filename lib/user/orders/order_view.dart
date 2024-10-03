@@ -117,11 +117,15 @@ class _OrderViewState extends State<OrderView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(
-        title: Text(
-          order?.date.formattedDateTime ?? "",
-          style: ThemeModel.theme.textTheme.titleMedium,
-        ),
-      ),
+          title: Text(
+            order?.date.formattedDateTime ?? "",
+            style: ThemeModel.theme.textTheme.titleMedium,
+          ),
+          icon: const Icon(
+            Icons.delete,
+            color: ThemeModel.darkRed,
+          ),
+          onIconPressed: onDeleteOrderPressed),
       body: PageBlueprint(
         fetching: productsWithQuantity.isEmpty,
         error: order == null,
@@ -184,11 +188,15 @@ class _OrderViewState extends State<OrderView> {
                             ),
                             Text(
                               customer?.displayName ?? "",
-                              style: ThemeModel.theme.textTheme.bodyLarge,
+                              style: ThemeModel.theme.textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.normal,
+                              ),
                             ),
                             Text(
                               customer?.email ?? "",
-                              style: ThemeModel.theme.textTheme.bodyLarge,
+                              style: ThemeModel.theme.textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.normal,
+                              ),
                             ),
                           ],
                         ),
@@ -291,16 +299,18 @@ class _OrderViewState extends State<OrderView> {
       );
 
   void updateOrderStatus(OrderStatus status) async {
+    Logger logger = Logger();
     setState(() {
       updatingStatus = true;
     });
     try {
       await FirestoreController.updateField(
           collection: "users/${order!.customerID}/orders", id: order!.id, field: "status", value: status.name);
-      Logger().i("Order status updated successfully");
+      logger.i("Order status updated successfully");
       Fluttertoast.showToast(msg: "✅ Order status updated successfully!");
-    } on Exception catch (e) {
-      Logger().e("Failed to update order status: ${e.toString()}");
+    } on Exception catch (e, s) {
+      logger.e("Failed to update order status: ${e.toString()}");
+      logger.e(s);
       Fluttertoast.showToast(msg: "❌ Failed to update order status, please try again later.");
       return;
     } finally {
@@ -316,4 +326,59 @@ class _OrderViewState extends State<OrderView> {
 
     await onRefresh?.call();
   }
+
+  void onDeleteOrderPressed() async => showDialog(
+        context: context,
+        builder: (context) {
+          bool deletingOrder = false;
+
+          return StatefulBuilder(builder: (context, setState) {
+            return AlertDialog(
+              title: Text("Delete order", style: ThemeModel.theme.textTheme.titleLarge),
+              content: const Text("Are you sure you want to delete this order?"),
+              actions: [
+                TextButton(
+                  onPressed: () => context.pop(),
+                  child: const Text("Cancel"),
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    backgroundColor: deletingOrder ? ThemeModel.darkGrey : ThemeModel.darkRed,
+                  ),
+                  onPressed: deletingOrder
+                      ? null
+                      : () async {
+                          Logger logger = Logger();
+                          logger.i("Deleting order...");
+
+                          setState(() => deletingOrder = true);
+
+                          try {
+                            await FirestoreController.deleteDocument(
+                              collection: "users/${order!.customerID}/orders",
+                              id: order!.id,
+                            );
+
+                            logger.i("Order deleted successfully");
+                            Fluttertoast.showToast(msg: "✅ Order deleted successfully!");
+                            onRefresh?.call();
+                            if (context.mounted) {
+                              context.pop();
+                              context.pop();
+                            }
+                          } on Exception catch (e, s) {
+                            logger.e("Failed to delete order: ${e.toString()}");
+                            logger.e(s);
+                            Fluttertoast.showToast(msg: "❌ Failed to delete order, please try again later.");
+                          } finally {
+                            setState(() => deletingOrder = false);
+                          }
+                        },
+                  child: deletingOrder ? Container(height: 20, width: 20, child: const Loader()) : const Text("Delete"),
+                ),
+              ],
+            );
+          });
+        },
+      );
 }

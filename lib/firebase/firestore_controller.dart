@@ -246,8 +246,10 @@ class FirestoreController {
     }
   }
 
-  static Future<void> deleteDocument(String collection, String id) async {
+  static Future<void> deleteDocument({required String collection, required String id}) async {
     var db = FirebaseFirestore.instance;
+
+    Logger().i("Deleting document $id from collection $collection");
 
     await db.collection(collection).doc(id).delete().catchError((e) {
       throw Exception("Failed to delete document: $e");

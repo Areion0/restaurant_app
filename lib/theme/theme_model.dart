@@ -20,6 +20,23 @@ class ThemeModel {
             ),
           ),
         ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            backgroundColor: darkBlue,
+            foregroundColor: lightGrey,
+            textStyle: const TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.bold,
+              color: darkBlue,
+            ),
+          ),
+        ),
+        dialogTheme: const DialogTheme(
+          contentTextStyle: TextStyle(
+            fontSize: 17,
+            color: darkBlue,
+          ),
+        ),
         textTheme: TextTheme(
           headlineLarge: const TextStyle(
             fontSize: 30,
