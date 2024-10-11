@@ -28,6 +28,8 @@ class _HomePageState extends State<HomePage> {
 
   late HomeController homeController;
 
+  bool firstTimeIdToken = true;
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +43,21 @@ class _HomePageState extends State<HomePage> {
       } else {
         context.authController.user ??= UserModel.fromMap(await FirestoreController.getDocument("users", user.uid));
         logger.i("User is signed in!");
+      }
+    });
+
+    FirebaseAuth.instance.idTokenChanges().listen((User? user) async {
+      Logger logger = Logger();
+
+      if (firstTimeIdToken) {
+        firstTimeIdToken = false;
+        return;
+      }
+
+      if (user != null) {
+        logger.i("Updating token...");
+
+        await context.authController.signInWithGoogleSilently();
       }
     });
   }

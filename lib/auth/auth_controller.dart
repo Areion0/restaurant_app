@@ -17,19 +17,21 @@ class AuthController with ChangeNotifier {
     notifyListeners();
   }
 
+  OAuthCredential? credential;
+
+  Future<void> signIn() async =>
+      await signInWithGoogle().then((credential) async => await signInWithCredential(credential));
+
   /// Signs in the user with Google.
-  Future<UserCredential> signInWithGoogle() async {
+  Future<OAuthCredential> signInWithGoogle() async {
     // Trigger the authentication flow
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
     // Obtain the auth details from the request
     final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
 
-    // Create a new credential
-    final OAuthCredential? credential;
-
     try {
-      credential = GoogleAuthProvider.credential(
+      return credential = GoogleAuthProvider.credential(
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
@@ -37,7 +39,34 @@ class AuthController with ChangeNotifier {
       Logger().e(s);
       throw Exception("Failed to create credential: $e");
     }
+  }
 
+  Future<OAuthCredential> signInWithGoogleSilently() async {
+    Logger logger = Logger();
+
+    logger.i("Signing in with Google silently...");
+
+    // Trigger the authentication flow
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signInSilently();
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+    try {
+      return credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+    } catch (e, s) {
+      logger.e(s);
+      throw Exception("Failed to create credential: $e");
+    } finally {
+      logger.i("Signed in with Google silently");
+    }
+  }
+
+  /// Signs in the user to FirebaseAuth with [OAuthCredential].
+  Future<UserCredential> signInWithCredential(OAuthCredential credential) async {
     try {
       userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
     } on FirebaseAuthException catch (e, s) {

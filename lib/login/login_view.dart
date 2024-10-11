@@ -49,7 +49,7 @@ class _LoginViewState extends State<LoginView> {
                   AuthController authController = context.authController;
 
                   try {
-                    await authController.signInWithGoogle();
+                    await authController.signIn();
                   } on Exception catch (e) {
                     Logger().e(e);
                     if (authController.userCredential?.user == null) {
