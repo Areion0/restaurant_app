@@ -9,8 +9,6 @@
 .history
 .svn/
 migrate_working_dir/
-*.jks
-upload-keystore.jks.base64
 
 # IntelliJ related
 *.iml
@@ -44,3 +42,9 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Sensitive files
+*.jks
+upload-keystore.jks.base64
+google-services.json
+.env

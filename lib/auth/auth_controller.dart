@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:logger/logger.dart';
+import 'package:restaurant_app/misc/extensions.dart';
 
 import '../firebase/firestore_controller.dart';
 import '../models/user_model.dart';
@@ -17,7 +18,7 @@ class AuthController with ChangeNotifier {
     notifyListeners();
   }
 
-  OAuthCredential? credential;
+  OAuthCredential? googleCredential;
 
   Future<void> signIn() async =>
       await signInWithGoogle().then((credential) async => await signInWithCredential(credential));
@@ -31,7 +32,7 @@ class AuthController with ChangeNotifier {
     final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
 
     try {
-      return credential = GoogleAuthProvider.credential(
+      return googleCredential = GoogleAuthProvider.credential(
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
@@ -53,7 +54,7 @@ class AuthController with ChangeNotifier {
     final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
 
     try {
-      return credential = GoogleAuthProvider.credential(
+      return googleCredential = GoogleAuthProvider.credential(
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
@@ -95,12 +96,16 @@ class AuthController with ChangeNotifier {
   }
 
   /// Signs out the current user.
-  Future<void> signOut() async {
+  Future<void> signOut(BuildContext context) async {
+    context.homeController.reset();
+    context.cartController.clear(notify: false);
+
     await FirebaseAuth.instance.signOut();
     await GoogleSignIn().signOut();
 
     user = null;
     userCredential = null;
+    googleCredential = null;
   }
 }
 

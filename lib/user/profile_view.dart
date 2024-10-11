@@ -78,7 +78,7 @@ class ProfileView extends StatelessWidget {
           // Log Out Button
           CustomElevatedButton(
             icon: const Icon(Icons.logout),
-            onPressed: context.authController.signOut,
+            onPressed: () => context.authController.signOut(context),
             child: const Text("Log Out"),
           ),
         ],

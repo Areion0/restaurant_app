@@ -55,7 +55,7 @@ class _LoginViewState extends State<LoginView> {
                     if (authController.userCredential?.user == null) {
                       Fluttertoast.showToast(msg: "❌ Login failed, please try again.");
                       // Logout google account
-                      authController.signOut();
+                      authController.signOut(context);
                       return;
                     }
                   }

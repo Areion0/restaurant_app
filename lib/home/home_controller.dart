@@ -78,4 +78,11 @@ class HomeController extends ChangeNotifier {
     fetching = true;
     prepareGalleries();
   }
+
+  void reset() {
+    firstTime = true;
+    _fetching = true;
+    _galleries = [];
+    _recentOrdersGallery = null;
+  }
 }

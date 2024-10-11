@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +26,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   StreamSubscription<User?>? _authStateChanges;
+  StreamSubscription<User?>? _idTokenChanges;
 
   late HomeController homeController;
 
@@ -46,7 +48,7 @@ class _HomePageState extends State<HomePage> {
       }
     });
 
-    FirebaseAuth.instance.idTokenChanges().listen((User? user) async {
+    _idTokenChanges = FirebaseAuth.instance.idTokenChanges().listen((User? user) async {
       Logger logger = Logger();
 
       if (firstTimeIdToken) {
@@ -69,6 +71,7 @@ class _HomePageState extends State<HomePage> {
     Logger().i("Disposing HomePage");
 
     _authStateChanges?.cancel();
+    _idTokenChanges?.cancel();
   }
 
   @override
@@ -80,7 +83,44 @@ class _HomePageState extends State<HomePage> {
     if (homeController.firstTime) {
       homeController.firstTime = false;
 
-      await homeController.prepareGalleries();
+      homeController.prepareGalleries();
+      requestNotificationsPermission();
+    }
+  }
+
+  Future<void> requestNotificationsPermission() async {
+    final notificationSettings = await FirebaseMessaging.instance.requestPermission();
+
+    if (notificationSettings.authorizationStatus == AuthorizationStatus.authorized ||
+        notificationSettings.authorizationStatus == AuthorizationStatus.provisional) {
+      Logger().i("User granted permission to receive notifications!");
+
+      // If user has no fcm token saved, try to get it and save it.
+      // Check Flutter secure storage
+      if (true || context.authController.user!.fcmToken.isEmpty) {
+        String? fcmToken = await FirebaseMessaging.instance.getToken();
+
+        Logger().i("FCM token: $fcmToken");
+
+        if (fcmToken == null) {
+          Logger().e("Failed to get FCM token!");
+          return;
+        }
+
+        await FirestoreController.saveFCMToken(fcmToken);
+      }
+
+      // Listen to token refresh
+      FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) async {
+        Logger().i("FCM token: $fcmToken");
+
+        await FirestoreController.saveFCMToken(fcmToken);
+      }).onError((err) {
+        Logger().e("Failed to listen to token refresh: $err");
+      });
+    } else {
+      Logger().i("User declined or has not accepted permission to receive notifications!");
+      return;
     }
   }
 

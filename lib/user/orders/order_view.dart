@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:gap/gap.dart';
 import 'package:logger/logger.dart';
+import 'package:restaurant_app/firebase/firebase_cloud_messaging_controller.dart';
 import 'package:restaurant_app/firebase/firestore_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/models/customer_order.dart';
@@ -308,6 +309,9 @@ class _OrderViewState extends State<OrderView> {
           collection: "users/${order!.customerID}/orders", id: order!.id, field: "status", value: status.name);
       logger.i("Order status updated successfully");
       Fluttertoast.showToast(msg: "✅ Order status updated successfully!");
+
+      if (!context.mounted) return;
+      await FirebaseCloudMessagingController.sendNotificationToUser(order!.customerID);
     } on Exception catch (e, s) {
       logger.e("Failed to update order status: ${e.toString()}");
       logger.e(s);

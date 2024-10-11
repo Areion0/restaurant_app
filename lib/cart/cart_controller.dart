@@ -68,12 +68,12 @@ class CartController extends ChangeNotifier {
       )
       .length;
 
-  void clear() {
+  void clear({bool notify = true}) {
     _items.clear();
 
     cartItems.clear();
     compactCartItems.clear();
-    notifyListeners();
+    if(notify) notifyListeners();
   }
 
   double get totalPrice => _items.fold(0, (previousValue, product) => previousValue + product.price);

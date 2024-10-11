@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/cart/cart_controller.dart';
+import 'package:restaurant_app/home/home_controller.dart';
 
 import '../auth/auth_controller.dart';
 
@@ -48,6 +49,7 @@ extension BuildContextExtensions on BuildContext {
   void goToLogin() => pushNamedAndRemoveAll("/login");
 
   /// Provider shortcuts for easy access
+  HomeController get homeController => read<HomeController>();
   AuthController get authController => read<AuthController>();
   CartController get cartController => read<CartController>();
 }

@@ -146,14 +146,31 @@ class FirestoreController {
   }
 
   static Future<void> addNewUser(User user) async {
+    Logger logger = Logger();
     try {
       Map<String, dynamic> userData = user.toMap();
       userData["role"] = "customer";
 
-      Logger().i("Adding user to Firestore...");
+      logger.i("Adding user to Firestore...");
       await addDocument(docName: user.uid, collection: "users", data: userData);
     } on Exception catch (e) {
-      Logger().e("Failed to add user: $e");
+      logger.e("Failed to add user: $e");
+    }
+  }
+
+  static Future<void> saveFCMToken(String token) async {
+    Logger logger = Logger();
+    try {
+      logger.i("Saving FCM token to Firestore...");
+      await updateField(
+        collection: "users",
+        id: FirebaseAuth.instance.currentUser!.uid,
+        field: "fcmToken",
+        value: token,
+      );
+      logger.i("FCM token saved successfully");
+    } on Exception catch (e) {
+      logger.e("Failed to save FCM token: $e");
     }
   }
 
