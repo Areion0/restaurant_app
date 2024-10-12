@@ -9,6 +9,9 @@ import '../models/user_model.dart';
 
 class AuthController with ChangeNotifier {
   UserCredential? userCredential;
+  User? firebaseUser;
+
+  Future<String> get idToken async => await firebaseUser?.getIdToken() ?? "";
   UserModel? _user;
 
   UserModel? get user => _user;
@@ -17,8 +20,6 @@ class AuthController with ChangeNotifier {
     _user = user;
     notifyListeners();
   }
-
-  OAuthCredential? googleCredential;
 
   Future<void> signIn() async =>
       await signInWithGoogle().then((credential) async => await signInWithCredential(credential));
@@ -32,7 +33,7 @@ class AuthController with ChangeNotifier {
     final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
 
     try {
-      return googleCredential = GoogleAuthProvider.credential(
+      return GoogleAuthProvider.credential(
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
@@ -54,7 +55,7 @@ class AuthController with ChangeNotifier {
     final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
 
     try {
-      return googleCredential = GoogleAuthProvider.credential(
+      return GoogleAuthProvider.credential(
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
@@ -70,6 +71,7 @@ class AuthController with ChangeNotifier {
   Future<UserCredential> signInWithCredential(OAuthCredential credential) async {
     try {
       userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      firebaseUser = userCredential?.user;
     } on FirebaseAuthException catch (e, s) {
       Logger().e(s);
       throw Exception("Failed to sign in with credential: ${e.message}");
@@ -104,8 +106,8 @@ class AuthController with ChangeNotifier {
     await GoogleSignIn().signOut();
 
     user = null;
+    firebaseUser = null;
     userCredential = null;
-    googleCredential = null;
   }
 }
 

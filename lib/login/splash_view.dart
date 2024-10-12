@@ -25,6 +25,7 @@ class _SplashViewState extends State<SplashView> {
     super.initState();
 
     _authStateChanges = FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+      context.authController.firebaseUser = user;
       Logger logger = Logger();
       if (user == null) {
         logger.i("User is currently signed out!");

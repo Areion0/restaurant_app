@@ -27,6 +27,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   StreamSubscription<User?>? _authStateChanges;
   StreamSubscription<User?>? _idTokenChanges;
+  StreamSubscription<String>? _onFCMTokenRefresh;
 
   late HomeController homeController;
 
@@ -43,6 +44,7 @@ class _HomePageState extends State<HomePage> {
 
         context.goToLogin();
       } else {
+        logger.i(await user.getIdToken());
         context.authController.user ??= UserModel.fromMap(await FirestoreController.getDocument("users", user.uid));
         logger.i("User is signed in!");
       }
@@ -56,11 +58,9 @@ class _HomePageState extends State<HomePage> {
         return;
       }
 
-      if (user != null) {
-        logger.i("Updating token...");
+      logger.i("Updated auth data");
 
-        await context.authController.signInWithGoogleSilently();
-      }
+      context.authController.firebaseUser = user;
     });
   }
 
@@ -72,10 +72,11 @@ class _HomePageState extends State<HomePage> {
 
     _authStateChanges?.cancel();
     _idTokenChanges?.cancel();
+    _onFCMTokenRefresh?.cancel();
   }
 
   @override
-  void didChangeDependencies() async {
+  void didChangeDependencies() {
     super.didChangeDependencies();
 
     homeController = context.watch<HomeController>();
@@ -91,37 +92,38 @@ class _HomePageState extends State<HomePage> {
   Future<void> requestNotificationsPermission() async {
     final notificationSettings = await FirebaseMessaging.instance.requestPermission();
 
-    if (notificationSettings.authorizationStatus == AuthorizationStatus.authorized ||
-        notificationSettings.authorizationStatus == AuthorizationStatus.provisional) {
-      Logger().i("User granted permission to receive notifications!");
+    switch (notificationSettings.authorizationStatus) {
+      case AuthorizationStatus.authorized:
+      case AuthorizationStatus.provisional:
+        Logger().i("User granted permission to receive notifications!");
+        await _handleFCMToken();
+        break;
+      case AuthorizationStatus.denied:
+        Logger().i("User declined permission to receive notifications!");
+        break;
+      case AuthorizationStatus.notDetermined:
+        Logger().i("User has not accepted or declined permission to receive notifications!");
+        break;
+    }
+  }
 
-      // If user has no fcm token saved, try to get it and save it.
-      // Check Flutter secure storage
-      if (true || context.authController.user!.fcmToken.isEmpty) {
-        String? fcmToken = await FirebaseMessaging.instance.getToken();
-
-        Logger().i("FCM token: $fcmToken");
-
-        if (fcmToken == null) {
-          Logger().e("Failed to get FCM token!");
-          return;
-        }
-
-        await FirestoreController.saveFCMToken(fcmToken);
-      }
-
-      // Listen to token refresh
-      FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) async {
-        Logger().i("FCM token: $fcmToken");
-
-        await FirestoreController.saveFCMToken(fcmToken);
-      }).onError((err) {
-        Logger().e("Failed to listen to token refresh: $err");
-      });
-    } else {
-      Logger().i("User declined or has not accepted permission to receive notifications!");
+  Future<void> _handleFCMToken() async {
+    String? fcmToken = await FirebaseMessaging.instance.getToken();
+    if (fcmToken == null) {
+      Logger().e("Failed to get FCM token!");
       return;
     }
+    Logger().i("FCM token: $fcmToken");
+    if (context.authController.user!.fcmToken.isEmpty || context.authController.user!.fcmToken != fcmToken) {
+      await FirestoreController.saveFCMToken(fcmToken);
+    }
+
+    _onFCMTokenRefresh = FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) async {
+      Logger().i("FCM token: $fcmToken");
+      await FirestoreController.saveFCMToken(fcmToken);
+    }, onError: (err) {
+      Logger().e("Failed to listen to token refresh: $err");
+    });
   }
 
   @override

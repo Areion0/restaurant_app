@@ -118,15 +118,18 @@ class _OrderViewState extends State<OrderView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(
-          title: Text(
-            order?.date.formattedDateTime ?? "",
-            style: ThemeModel.theme.textTheme.titleMedium,
-          ),
-          icon: const Icon(
-            Icons.delete,
-            color: ThemeModel.darkRed,
-          ),
-          onIconPressed: onDeleteOrderPressed),
+        title: Text(
+          order?.date.formattedDateTime ?? "",
+          style: ThemeModel.theme.textTheme.titleMedium,
+        ),
+        icon: context.authController.user!.isAdmin
+            ? const Icon(
+                Icons.delete,
+                color: ThemeModel.darkRed,
+              )
+            : null,
+        onIconPressed: context.authController.user!.isAdmin ? onDeleteOrderPressed : null,
+      ),
       body: PageBlueprint(
         fetching: productsWithQuantity.isEmpty,
         error: order == null,
@@ -307,15 +310,20 @@ class _OrderViewState extends State<OrderView> {
     try {
       await FirestoreController.updateField(
           collection: "users/${order!.customerID}/orders", id: order!.id, field: "status", value: status.name);
-      logger.i("Order status updated successfully");
-      Fluttertoast.showToast(msg: "✅ Order status updated successfully!");
 
       if (!context.mounted) return;
-      await FirebaseCloudMessagingController.sendNotificationToUser(order!.customerID);
+      await FirebaseCloudMessagingController.sendNotificationToUser(
+        order!.customerID,
+        newOrderStatus: status,
+        idToken: await context.authController.idToken,
+      );
+      logger.i("Order status updated successfully");
+      Fluttertoast.showToast(msg: "✅ Order status updated successfully!");
     } on Exception catch (e, s) {
       logger.e("Failed to update order status: ${e.toString()}");
       logger.e(s);
-      Fluttertoast.showToast(msg: "❌ Failed to update order status, please try again later.");
+
+      showErrorMsg(e);
       return;
     } finally {
       setState(() {
@@ -329,6 +337,16 @@ class _OrderViewState extends State<OrderView> {
     });
 
     await onRefresh?.call();
+  }
+
+  void showErrorMsg(Exception e) {
+    late final String errorMessage;
+    if (e.toString().contains("Failed to send notification")) {
+      errorMessage = "❌ Failed to send notification to user, please try again later.";
+    } else {
+      errorMessage = "❌ Failed to update order status, please try again later.";
+    }
+    Fluttertoast.showToast(msg: errorMessage);
   }
 
   void onDeleteOrderPressed() async => showDialog(
