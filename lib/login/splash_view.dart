@@ -3,9 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:restaurant_app/firebase/firestore_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
-import 'package:restaurant_app/models/user_model.dart';
 
 import '../theme/theme_model.dart';
 import '../widgets/loader.dart';
@@ -32,8 +30,7 @@ class _SplashViewState extends State<SplashView> {
 
         if (context.mounted) context.goToLogin();
       } else {
-        if (context.mounted)
-          context.authController.user = UserModel.fromMap(await FirestoreController.getDocument("users", user.uid));
+        if (context.mounted) await context.authController.refreshUserData(uid: user.uid);
 
         logger.i("User is signed in!");
         if (context.mounted) context.pushNamedAndRemoveAll("/home");

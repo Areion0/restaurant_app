@@ -44,8 +44,8 @@ class _HomePageState extends State<HomePage> {
 
         context.goToLogin();
       } else {
-        logger.i(await user.getIdToken());
-        context.authController.user ??= UserModel.fromMap(await FirestoreController.getDocument("users", user.uid));
+        // logger.i(await user.getIdToken());
+        await context.authController.refreshUserData(uid: user.uid);
         logger.i("User is signed in!");
       }
     });

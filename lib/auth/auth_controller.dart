@@ -21,6 +21,13 @@ class AuthController with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> refreshUserData({String? uid}) async {
+    if (uid == null && user == null) return;
+    uid ??= user!.uid;
+
+    user = UserModel.fromMap(await FirestoreController.getDocument("users", uid));
+  }
+
   Future<void> signIn() async =>
       await signInWithGoogle().then((credential) async => await signInWithCredential(credential));
 

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/cart/cart_controller.dart';
+import 'package:restaurant_app/firebase/firestore_controller.dart';
+import 'package:restaurant_app/helpers/location.dart';
 import 'package:restaurant_app/misc/extensions.dart';
 import 'package:restaurant_app/widgets/rectangle_box.dart';
 import 'package:slide_to_act/slide_to_act.dart';
@@ -8,6 +12,7 @@ import 'package:slide_to_act/slide_to_act.dart';
 import '../theme/theme_model.dart';
 import '../widgets/custom_appbar.dart';
 import '../widgets/loader.dart';
+import '../widgets/map/map_preview.dart';
 import '../widgets/page_blueprint.dart';
 
 class CheckoutView extends StatefulWidget {
@@ -20,11 +25,56 @@ class CheckoutView extends StatefulWidget {
 class _CheckoutViewState extends State<CheckoutView> {
   late CartController cart;
 
+  Position? userLocation;
+
+  bool gettingAddress = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (context.authController.user!.streetAddress == null) {
+      Future.microtask(() => _getUserLocationData());
+    }
+  }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
     cart = context.watch<CartController>();
+  }
+
+  Future<void> _getUserLocationData() async {
+    setState(() => gettingAddress = true);
+
+    String streetAddress = await LocationHelper.getCurrentAddress(token: await context.authController.idToken);
+
+    await FirestoreController.updateField(
+        collection: "users", id: context.authController.user!.uid, field: "streetAddress", value: streetAddress);
+
+    await context.authController.refreshUserData();
+
+    setState(() => gettingAddress = false);
+  }
+
+  bool get noAddressFound =>
+      context.authController.user!.streetAddress == null || context.authController.user!.streetAddress!.isEmpty;
+
+  String get streetAddress {
+    if (noAddressFound) {
+      return "Street Address";
+    }
+
+    return context.authController.user!.streetAddress!.split(",")[0];
+  }
+
+  String get cityPostalCode {
+    if (noAddressFound) {
+      return "City, Postal Code";
+    }
+
+    return context.authController.user!.streetAddress!.split(",")[1];
   }
 
   @override
@@ -49,53 +99,77 @@ class _CheckoutViewState extends State<CheckoutView> {
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       child: RectangleBox(
                         height: 100,
-                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                          Expanded(
-                            flex: 5,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 5),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Address
-                                  Text(
-                                    "Kolokotroni 39",
-                                    style: ThemeModel.theme.textTheme.bodyLarge,
-                                    textAlign: TextAlign.left,
-                                  ),
-
-                                  // City & Postal Code
-                                  Text(
-                                    "Athens, 105 62",
-                                    style: ThemeModel.theme.textTheme.bodyLarge,
-                                    textAlign: TextAlign.left,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-
-                          // Map preview
-                          Container(
-                            width: 70,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: ThemeModel.darkBlue,
-                            ),
-                            child: const Padding(
-                              padding: EdgeInsets.only(right: 5, top: 5),
-                              child: Align(
-                                alignment: Alignment.topRight,
-                                child: Icon(
-                                  Icons.edit_location_alt_outlined,
-                                  size: 25,
-                                  color: ThemeModel.lightGrey,
+                        child: gettingAddress
+                            ? const Center(
+                                child: LoaderWithLabel(
+                                  color: ThemeModel.darkBlue,
+                                  text: "Getting Address...",
                                 ),
-                              ),
-                            ),
-                          ),
-                        ]),
+                              )
+                            : Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                                Expanded(
+                                  flex: 5,
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 5),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        // Address
+                                        Text(
+                                          streetAddress,
+                                          style: ThemeModel.theme.textTheme.bodyLarge,
+                                          textAlign: TextAlign.left,
+                                        ),
+
+                                        // City & Postal Code
+                                        Text(
+                                          cityPostalCode,
+                                          style: ThemeModel.theme.textTheme.bodyLarge,
+                                          textAlign: TextAlign.left,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+
+                                // Map preview
+                                Container(
+                                  width: 70,
+                                  clipBehavior: Clip.antiAlias,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    color: ThemeModel.darkBlue,
+                                  ),
+                                  child: Stack(
+                                    children: [
+                                      // Map Preview
+                                      const MapPreview(
+                                        initialLocation: LatLng(37.977422, 23.724823),
+                                      ),
+
+                                      Padding(
+                                        padding: const EdgeInsets.only(right: 5, bottom: 5),
+                                        child: Align(
+                                          alignment: Alignment.bottomRight,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(2),
+                                            decoration: BoxDecoration(
+                                              color: ThemeModel.lightGrey,
+                                              borderRadius: BorderRadius.circular(10),
+                                            ),
+                                            child: const Icon(
+                                              Icons.edit_location_alt_outlined,
+                                              size: 25,
+                                              color: ThemeModel.darkBlue,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ]),
                       ),
                     ),
 
@@ -161,7 +235,8 @@ class _CheckoutViewState extends State<CheckoutView> {
                       child: ListView.separated(
                           itemBuilder: (context, index) => Padding(
                                 padding: EdgeInsets.only(
-                                    top: index == 0 ? 20 : 0, bottom: index == cart.compactCartItems.length - 1 ? 20 : 0),
+                                    top: index == 0 ? 20 : 0,
+                                    bottom: index == cart.compactCartItems.length - 1 ? 20 : 0),
                                 child: cart.compactCartItems[index],
                               ),
                           separatorBuilder: (context, index) => const SizedBox(
