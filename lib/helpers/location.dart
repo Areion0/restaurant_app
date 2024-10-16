@@ -43,18 +43,17 @@ Future<Position> determinePosition() async {
 }
 
 class LocationHelper {
-  static Future<String> getCurrentAddress({required String token}) async {
+  static Future<Map<String, dynamic>> getCurrentAddress({required String token}) async {
     try {
       final position = await determinePosition();
-
 
       final String address = await _determineAddress(position, token: token);
 
       Logger().i("Current address: $address");
 
-      return address;
+      return {"address": address, "position": position};
     } catch (e) {
-      return "";
+      return {};
     }
   }
 

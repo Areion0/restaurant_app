@@ -5,8 +5,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapPreview extends StatefulWidget {
   final LatLng initialLocation;
+  final Function onMapCreated;
   const MapPreview({
     required this.initialLocation,
+    required this.onMapCreated,
     super.key,
   });
 
@@ -58,7 +60,10 @@ class _MapPreviewState extends State<MapPreview> {
           position: widget.initialLocation,
         ),
       },
-      onMapCreated: (GoogleMapController controller) => _controller.complete(controller),
+      onMapCreated: (GoogleMapController controller) {
+        widget.onMapCreated();
+        _controller.complete(controller);
+      },
     );
   }
 }

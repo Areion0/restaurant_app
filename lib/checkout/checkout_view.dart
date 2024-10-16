@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/cart/cart_controller.dart';
 import 'package:restaurant_app/firebase/firestore_controller.dart';
@@ -27,6 +28,7 @@ class _CheckoutViewState extends State<CheckoutView> {
 
   Position? userLocation;
 
+  bool loadingMap = true;
   bool gettingAddress = false;
 
   @override
@@ -48,10 +50,24 @@ class _CheckoutViewState extends State<CheckoutView> {
   Future<void> _getUserLocationData() async {
     setState(() => gettingAddress = true);
 
-    String streetAddress = await LocationHelper.getCurrentAddress(token: await context.authController.idToken);
+    Map<String, dynamic> locationData =
+        await LocationHelper.getCurrentAddress(token: await context.authController.idToken);
 
-    await FirestoreController.updateField(
-        collection: "users", id: context.authController.user!.uid, field: "streetAddress", value: streetAddress);
+    Logger().i("Updating user address data...");
+
+    await Future.wait([
+      FirestoreController.updateField(
+          collection: "users",
+          id: context.authController.user!.uid,
+          field: "streetAddress",
+          value: locationData["address"]),
+      FirestoreController.updateField(
+        collection: "users",
+        id: context.authController.user!.uid,
+        field: "addressLocation",
+        value: {"latitude": locationData["position"].latitude, "longitude": locationData["position"].longitude},
+      ),
+    ]);
 
     await context.authController.refreshUserData();
 
@@ -66,7 +82,7 @@ class _CheckoutViewState extends State<CheckoutView> {
       return "Street Address";
     }
 
-    return context.authController.user!.streetAddress!.split(",")[0];
+    return context.authController.user!.streetAddress!.split(",")[0].trim();
   }
 
   String get cityPostalCode {
@@ -74,7 +90,7 @@ class _CheckoutViewState extends State<CheckoutView> {
       return "City, Postal Code";
     }
 
-    return context.authController.user!.streetAddress!.split(",")[1];
+    return context.authController.user!.streetAddress!.split(",")[1].trim();
   }
 
   @override
@@ -144,24 +160,38 @@ class _CheckoutViewState extends State<CheckoutView> {
                                   child: Stack(
                                     children: [
                                       // Map Preview
-                                      const MapPreview(
-                                        initialLocation: LatLng(37.977422, 23.724823),
-                                      ),
-
-                                      Padding(
-                                        padding: const EdgeInsets.only(right: 5, bottom: 5),
-                                        child: Align(
-                                          alignment: Alignment.bottomRight,
-                                          child: Container(
-                                            padding: const EdgeInsets.all(2),
-                                            decoration: BoxDecoration(
-                                              color: ThemeModel.lightGrey,
-                                              borderRadius: BorderRadius.circular(10),
+                                      Stack(
+                                        children: [
+                                          MapPreview(
+                                            initialLocation: context.authController.user!.addressLocation ??
+                                                const LatLng(37.977422, 23.724823),
+                                            onMapCreated: () => setState(() => loadingMap = false),
+                                          ),
+                                          if (loadingMap)
+                                            const Center(
+                                              child: Loader(
+                                                color: ThemeModel.lightGrey,
+                                              ),
                                             ),
-                                            child: const Icon(
-                                              Icons.edit_location_alt_outlined,
-                                              size: 25,
-                                              color: ThemeModel.darkBlue,
+                                        ],
+                                      ),
+                                      GestureDetector(
+                                        onTap: _getUserLocationData,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(right: 5, bottom: 5),
+                                          child: Align(
+                                            alignment: Alignment.bottomRight,
+                                            child: Container(
+                                              padding: const EdgeInsets.all(2),
+                                              decoration: BoxDecoration(
+                                                color: ThemeModel.lightGrey,
+                                                borderRadius: BorderRadius.circular(10),
+                                              ),
+                                              child: const Icon(
+                                                Icons.edit_location_alt_outlined,
+                                                size: 25,
+                                                color: ThemeModel.darkBlue,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -326,10 +356,21 @@ class _CheckoutViewState extends State<CheckoutView> {
                 child: SlideAction(
                   sliderButtonIconPadding: 12,
                   sliderRotate: false,
+                  outerColor: gettingAddress ? ThemeModel.darkGrey : ThemeModel.darkBlue,
                   innerColor: ThemeModel.lightGrey,
+                  sliderButtonIcon: gettingAddress
+                      ? Container(
+                          height: 24,
+                          width: 24,
+                          child: const Loader(
+                            color: ThemeModel.darkBlue,
+                          ))
+                      : null,
+                  sliderButtonIconSize: 28,
                   submittedIcon: const Loader(
                     strokeWidth: 5.5,
                   ),
+                  enabled: !gettingAddress,
                   onSubmit: () => cart.onSubmit(context),
                   text: "Submit",
                   textStyle: ThemeModel.titleLargeTextStyle.light,

@@ -73,7 +73,7 @@ class CartController extends ChangeNotifier {
 
     cartItems.clear();
     compactCartItems.clear();
-    if(notify) notifyListeners();
+    if (notify) notifyListeners();
   }
 
   double get totalPrice => _items.fold(0, (previousValue, product) => previousValue + product.price);
@@ -81,15 +81,20 @@ class CartController extends ChangeNotifier {
   Future<void> onSubmit(BuildContext context) async {
     Logger().i("Sending order with ${items.length} products...");
 
-    await FirestoreController.submitOrder(
-      CustomerOrder.local(
-        date: DateTime.now(),
-        productIDs: items.map((product) => product.id).toList(),
-        total: items.fold(0.0, (sum, product) => sum + product.price),
-        customerID: context.authController.user!.uid,
-        status: OrderStatus.pending,
-      ),
-    );
+    try {
+      await FirestoreController.submitOrder(
+        CustomerOrder.local(
+          date: DateTime.now(),
+          productIDs: items.map((product) => product.id).toList(),
+          total: items.fold(0.0, (sum, product) => sum + product.price),
+          customerID: context.authController.user!.uid,
+          status: OrderStatus.pending,
+        ),
+      );
+    } catch (e) {
+      Fluttertoast.showToast(msg: "❌ Your order could not be submitted.\nPlease try again later.");
+      return;
+    }
 
     Fluttertoast.showToast(msg: "✅ Order submitted!");
 

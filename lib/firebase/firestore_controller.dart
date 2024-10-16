@@ -242,24 +242,25 @@ class FirestoreController {
   }
 
   static Future<void> submitOrder(CustomerOrder customerOrder) async {
-    Map<String, dynamic> order = customerOrder.toMap();
-
     try {
+      Map<String, dynamic> order = customerOrder.toMap();
       var db = FirebaseFirestore.instance;
 
       Future<void> firestoreOperation =
           db.collection("users").doc(FirebaseAuth.instance.currentUser!.uid).collection("orders").add(order);
 
       await firestoreOperation.timeout(
-        const Duration(seconds: 5),
+        const Duration(seconds: 20),
         onTimeout: () {
           throw TimeoutException("The operation has timed out.");
         },
       );
 
       Logger().i("Order submitted successfully");
-    } catch (e) {
-      Logger().i('Error submitting order: $e');
+    } catch (e, s) {
+      Logger().e("Failed to submit order: $e");
+      Logger().e(s);
+      throw Exception("Failed to submit order: $e");
     }
   }
 
