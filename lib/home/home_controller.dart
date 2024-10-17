@@ -32,11 +32,11 @@ class HomeController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> prepareGalleries() async {
+  Future<void> prepareGalleries(BuildContext context) async {
     Logger logger = Logger();
     try {
+      galleries = await FirestoreController.getProductGalleries(context);
       await prepareRecentOrdersGallery();
-      galleries = await FirestoreController.getProductGalleries();
     } on Exception catch (e) {
       logger.e("Failed to get products: $e");
     } finally {
@@ -74,9 +74,9 @@ class HomeController extends ChangeNotifier {
     }
   }
 
-  void refreshData() {
+  void refreshData(BuildContext context) {
     fetching = true;
-    prepareGalleries();
+    prepareGalleries(context);
   }
 
   void reset() {

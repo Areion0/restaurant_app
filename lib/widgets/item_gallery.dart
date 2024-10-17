@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:restaurant_app/misc/extensions.dart';
+import 'package:restaurant_app/models/gallery_type.dart';
 import 'package:restaurant_app/models/product_gallery.dart';
 import 'package:restaurant_app/theme/theme_model.dart';
 import 'package:restaurant_app/widgets/image_button.dart';
@@ -25,6 +26,10 @@ class _ItemGalleryState extends State<ItemGallery> {
   void initState() {
     super.initState();
 
+    prepareProductButtons();
+  }
+
+  void prepareProductButtons() {
     productButtons = widget.gallery.products
         .map((product) => ImageButton(
               imageUrl: product.imageURL ?? "",
@@ -35,6 +40,10 @@ class _ItemGalleryState extends State<ItemGallery> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.gallery.type == GalleryType.favorites) {
+      prepareProductButtons();
+    }
+
     return Column(
       children: [
         Row(
@@ -70,7 +79,7 @@ class _ItemGalleryState extends State<ItemGallery> {
                 )
               : ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: widget.gallery.products.length,
+                  itemCount: productButtons.length,
                   itemBuilder: (context, index) {
                     return Container(width: 140, child: productButtons[index]);
                   },

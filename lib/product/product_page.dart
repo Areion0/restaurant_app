@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/auth/auth_controller.dart';
+import 'package:restaurant_app/firebase/firestore_controller.dart';
 import 'package:restaurant_app/misc/extensions.dart';
+import 'package:restaurant_app/models/user_model.dart';
 import 'package:restaurant_app/widgets/custom_appbar.dart';
 import 'package:restaurant_app/widgets/page_blueprint.dart';
 import 'package:restaurant_app/widgets/photos/custom_cached_network_image.dart';
@@ -18,24 +22,49 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
-  bool favorite = false;
+  bool favoriteLoading = false;
+  bool get favorite => context.authController.user!.favorites.contains(widget.product.id);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(
-          icon: Icon(
-            favorite ? Icons.favorite : Icons.favorite_border,
-            color: ThemeModel.darkRed,
-          ),
+          icon: Selector<AuthController, UserModel>(
+              selector: (context, authController) => authController.user!,
+              builder: (context, user, child) {
+                return Container(
+                    height: 30,
+                    width: 30,
+                    child: favoriteLoading
+                        ? const Center(
+                            child: Loader(
+                              color: ThemeModel.darkBlue,
+                            ),
+                          )
+                        : Icon(
+                            favorite ? Icons.favorite : Icons.favorite_border,
+                            color: ThemeModel.darkRed,
+                          ));
+              }),
           title: Text(
             widget.product.name,
             style: ThemeModel.theme.textTheme.titleMedium,
           ),
-          onIconPressed: () {
+          onIconPressed: () async {
+            if (favoriteLoading) return;
+
             setState(() {
-              favorite = !favorite;
+              favoriteLoading = true;
             });
+            if (favorite) {
+              await FirestoreController.removeFromFavorites(context, productID: widget.product.id);
+            } else {
+              await FirestoreController.addToFavorites(context, productID: widget.product.id);
+            }
+
+            if (context.mounted) await context.authController.refreshUserData();
+
+            if (mounted) setState(() => favoriteLoading = false);
           }),
       body: SingleChildScrollView(
         child: Column(

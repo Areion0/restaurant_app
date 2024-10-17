@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
     if (homeController.firstTime) {
       homeController.firstTime = false;
 
-      homeController.prepareGalleries();
+      homeController.prepareGalleries(context);
       requestNotificationsPermission();
     }
   }
@@ -213,7 +213,7 @@ class _HomePageState extends State<HomePage> {
             Container(
               height: context.screenSize.height * 0.85,
               child: ListView.separated(
-                separatorBuilder: (context, index) => const SizedBox(height: 30),
+                separatorBuilder: (context, index) => const SizedBox(height: 20),
                 itemCount: homeController.galleries.length + (homeController.recentOrdersGallery != null ? 1 : 0),
                 itemBuilder: (ctx, index) => ItemGallery(
                   gallery: homeController.recentOrdersGallery != null

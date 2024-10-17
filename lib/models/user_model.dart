@@ -11,6 +11,7 @@ class UserModel {
   final String fcmToken;
   final String? streetAddress;
   final LatLng? addressLocation;
+  final List<String> favorites;
 
   UserModel({
     required this.uid,
@@ -21,6 +22,7 @@ class UserModel {
     this.fcmToken = "",
     this.streetAddress,
     this.addressLocation,
+    this.favorites = const [],
   });
 
   bool get isAdmin => role == UserRole.admin;
@@ -36,6 +38,7 @@ class UserModel {
         addressLocation: data["addressLocation"] != null
             ? LatLng(data["addressLocation"]["latitude"], data["addressLocation"]["longitude"])
             : null,
+        favorites: data["favorites"] != null ? List<String>.from(data["favorites"]) : [],
       );
 
   Map<String, dynamic> toMap() => {
@@ -52,5 +55,6 @@ class UserModel {
                 "longitude": addressLocation!.longitude,
               }
             : null,
+        "favorites": favorites,
       };
 }
