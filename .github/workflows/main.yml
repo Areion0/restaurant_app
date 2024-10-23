@@ -9,7 +9,9 @@ jobs:
   check-version:
     runs-on: ubuntu-latest
     outputs:
-      version_changed: ${{ steps.check_version.outputs.version_changed }}
+      version_changed: ${{ steps.check-version.outputs.version_changed }}
+      version: ${{ steps.extract-version.outputs.version }}
+      tag_exists: ${{ steps.check-tag.outputs.tag_exists }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -17,7 +19,7 @@ jobs:
           fetch-depth: 2 # Fetch the last two commits for comparison
 
       - name: Check if version changed
-        id: check_version
+        id: check-version
         run: |
           VERSION_CHANGED=$(git diff HEAD^ HEAD -- pubspec.yaml | grep 'version:')
           if [[ -z "$VERSION_CHANGED" ]]; then
@@ -28,9 +30,27 @@ jobs:
             echo "::set-output name=version_changed::true"
           fi
 
+      - name: Extract version from pubspec.yaml
+        id: extract-version
+        run: |
+          version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
+          echo "::set-output name=version::$version"
+
+      - name: Check if Tag Exists
+        id: check-tag
+        run: |
+          version=${{ steps.extract-version.outputs.version }}
+          if git rev-parse "v$version" >/dev/null 2>&1; then
+            echo "Tag v$version already exists."
+            echo "::set-output name=tag_exists::true"
+          else
+            echo "Tag v$version does not exist."
+            echo "::set-output name=tag_exists::false"
+          fi
+
   build:
     needs: check-version
-    if: needs.check-version.outputs.version_changed == 'true'
+    if: needs.check-version.outputs.version_changed == 'true' && needs.check-version.outputs.tag_exists == 'false'
     name: Build & Release
     runs-on: ubuntu-latest
 
@@ -80,30 +100,10 @@ jobs:
           name: Releases
           path: |
             build/app/outputs/flutter-apk/app-release.apk
-      - name: Extract version from pubspec.yaml
-        id: extract_version
-        run: |
-          version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
-          echo "VERSION=$version" >> $GITHUB_ENV
-
-      - name: Check if Tag Exists
-        id: check_tag
-        run: |
-          if git rev-parse "v${{ env.VERSION }}" >/dev/null 2>&1; then
-            echo "TAG_EXISTS=true" >> $GITHUB_ENV
-          else
-            echo "TAG_EXISTS=false" >> $GITHUB_ENV
-          fi
-      - name: Modify Tag
-        if: env.TAG_EXISTS == 'true'
-        id: modify_tag
-        run: |
-          new_version="${{ env.VERSION }}-build-${{ github.run_number }}"
-          echo "VERSION=$new_version" >> $GITHUB_ENV
 
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
           artifacts: "build/app/outputs/flutter-apk/app-release.apk"
-          tag: v${{ env.VERSION }}
+          tag: v${{ needs.check-version.outputs.version }}
           token: ${{ secrets.TOKEN }}
