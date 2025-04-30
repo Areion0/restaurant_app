@@ -8,7 +8,6 @@ import 'package:restaurant_app/home/home_page.dart';
 import 'package:restaurant_app/login/login_view.dart';
 import 'package:restaurant_app/theme/theme_model.dart';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'checkout/checkout_view.dart';
 import 'firebase_options.dart';
@@ -20,9 +19,6 @@ import 'user/profile_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Load environmental variables file
-  await dotenv.load();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

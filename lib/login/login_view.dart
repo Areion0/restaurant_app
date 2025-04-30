@@ -8,14 +8,9 @@ import 'package:restaurant_app/widgets/page_blueprint.dart';
 
 import '../widgets/custom_elevated_button.dart';
 
-class LoginView extends StatefulWidget {
+class LoginView extends StatelessWidget {
   const LoginView({super.key});
 
-  @override
-  State<LoginView> createState() => _LoginViewState();
-}
-
-class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,7 +50,7 @@ class _LoginViewState extends State<LoginView> {
                     if (authController.userCredential?.user == null) {
                       Fluttertoast.showToast(msg: "❌ Login failed, please try again.");
                       // Logout google account
-                      authController.signOut(context);
+                      if (context.mounted) authController.signOut(context);
                       return;
                     }
                   }

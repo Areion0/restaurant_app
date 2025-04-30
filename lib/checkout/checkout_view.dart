@@ -336,7 +336,7 @@ class _CheckoutViewState extends State<CheckoutView> {
                                 style: ThemeModel.theme.textTheme.bodyLarge?.light,
                               ),
                               Text(
-                                (cart.totalPrice * 1.24).price,
+                                cart.totalPriceWithTax.price,
                                 style: ThemeModel.theme.textTheme.bodyLarge?.light,
                               ),
                             ],

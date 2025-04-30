@@ -10,14 +10,9 @@ import 'package:restaurant_app/widgets/page_blueprint.dart';
 
 import '../../theme/theme_model.dart';
 
-class MyOrdersView extends StatefulWidget {
+class MyOrdersView extends StatelessWidget {
   const MyOrdersView({super.key});
 
-  @override
-  State<MyOrdersView> createState() => _MyOrdersViewState();
-}
-
-class _MyOrdersViewState extends State<MyOrdersView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

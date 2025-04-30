@@ -47,7 +47,7 @@ class _CustomElevatedButtonState extends State<CustomElevatedButton> {
                   if (result is Future) {
                     setState(() => loading = true);
                     await result;
-                    setState(() => loading = false);
+                    if (mounted) setState(() => loading = false);
                   }
                 },
           child: widget.loading || loading
