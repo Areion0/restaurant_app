@@ -78,10 +78,8 @@ jobs:
       
       - name: Create firebase_options.dart
         run: |
-          cat <<EOF > lib/firebase_options.dart
-          ${{ secrets.FIREBASE_OPTIONS_DART }}
-          EOF
-
+          echo "${{ secrets.FIREBASE_OPTIONS_DART }}" > lib/firebase_options.dart
+          
       - name: Create .env
         run: |
           echo "${{ secrets.ENV }}" > .env
